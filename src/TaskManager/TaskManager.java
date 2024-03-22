@@ -3,10 +3,14 @@ package TaskManager;
 import Task.*;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class TaskManager {
 
-    private int id;
+
+    private int nextTaskId = 1;
+    private int nextSubTaskId = 1;
+    private int nextEpicId = 1;
 
     private final Map<Integer, Task> tasks;
     private final Map<Integer, SubTask> subTasks;
@@ -102,17 +106,32 @@ public class TaskManager {
         tasks.remove(id);
     }
 
-    public void removeSubTaskById(int id) {
+    public void removeSubTaskById(int id, boolean updateEpic) {
         final SubTask removableSubTask = subTasks.get(id);
+        subTasks.remove(id);
+
         int specificEpicId = removableSubTask.getEpicId();
         final Epic specificEpic = epics.get(specificEpicId);
-        specificEpic.removeSubTask(id);
-        subTasks.remove(id);
-        updateEpicStatus(specificEpicId);
+
+        if (updateEpic) {
+            specificEpic.removeSubTask(id);
+            updateEpicStatus(specificEpicId);
+        }
+
+    }
+
+    public void removeSubTaskById(int id) {
+        removeSubTaskById(id, true);
     }
 
     public void removeEpicById(int id) {
+        final Epic removableEpic = epics.get(id);
+        for (Integer subTaskId : removableEpic.getSubtaskIds()) {
+            removeSubTaskById(subTaskId, false);
+        }
+
         epics.remove(id);
+
     }
 
     public void updateTask(Task task, int id) {
@@ -178,21 +197,31 @@ public class TaskManager {
     }
 
     private void setTaskId(Task task) {
-        Set<Integer> setKeys = tasks.keySet();
-        id = setKeys.size() + 1;
-        task.setTaskId(id);
+        task.setTaskId(getNextTaskId());
     }
 
     private void setSubTaskId(SubTask subTask) {
-        Set<Integer> setKeys = subTasks.keySet();
-        id = setKeys.size() + 1;
-        subTask.setTaskId(id);
+        subTask.setTaskId(getNextSubTaskId());
     }
 
     private void setEpicId(Epic epic) {
-        Set<Integer> setKeys = epics.keySet();
-        id = setKeys.size() + 1;
-        epic.setTaskId(id);
+        epic.setTaskId(getNextEpicId());
     }
+
+    public int getNextTaskId() {
+        nextTaskId += nextTaskId;
+        return nextTaskId;
+    }
+
+    public int getNextSubTaskId() {
+        nextSubTaskId += nextSubTaskId;
+        return nextSubTaskId;
+    }
+
+    public int getNextEpicId() {
+        nextEpicId += nextEpicId;
+        return nextEpicId;
+    }
+
 }
 

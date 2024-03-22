@@ -40,5 +40,6 @@ public class Main {
         taskManager.removeEpicById(epic1.getTaskId());
         System.out.println(taskManager.getTasks());
         System.out.println(taskManager.getEpic());
+        System.out.println(taskManager.getSubTasks());
     }
 }

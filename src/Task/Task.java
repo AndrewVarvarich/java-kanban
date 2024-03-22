@@ -1,10 +1,13 @@
+package Task;
+
+import TaskManager.*;
 import java.util.Objects;
 
 public class Task {
 
-    private String name;
-    private String description;
-    private TaskStatus status;
+    protected String name;
+    protected String description;
+    protected TaskStatus status;
     protected int taskId;
 
     public Task(String name, String description, TaskStatus status) {
@@ -17,8 +20,7 @@ public class Task {
         return name;
     }
 
-
-    public void setId(int id) {
+    public void setTaskId(int id) {
         this.taskId = id;
     }
 
@@ -36,8 +38,10 @@ public class Task {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         Task task = (Task) o;
         return Objects.equals(name, task.name) && Objects.equals(description, task.description);
     }

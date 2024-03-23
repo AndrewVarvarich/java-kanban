@@ -1,6 +1,6 @@
-package Task;
+package task;
 
-import TaskManager.*;
+import taskManager.*;
 import java.util.Objects;
 
 public class Task {

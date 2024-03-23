@@ -1,16 +1,13 @@
-package TaskManager;
+package taskManager;
 
-import Task.*;
+import task.*;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class TaskManager {
 
 
     private int nextTaskId = 1;
-    private int nextSubTaskId = 1;
-    private int nextEpicId = 1;
 
     private final Map<Integer, Task> tasks;
     private final Map<Integer, SubTask> subTasks;
@@ -23,27 +20,15 @@ public class TaskManager {
     }
 
     public List<Task> getTasks() {
-        List<Task> tasksList = new ArrayList<>();
-        for (Task task : tasks.values()) {
-            tasksList.add(task);
-        }
-        return tasksList;
+        return new ArrayList<>(tasks.values());
     }
 
     public List<SubTask> getSubTasks() {
-        List<SubTask> subTasksList = new ArrayList<>();
-        for (SubTask subTask : subTasks.values()) {
-            subTasksList.add(subTask);
-        }
-        return subTasksList;
+        return new ArrayList<>(subTasks.values());
     }
 
-    public List<Epic> getEpic() {
-        List<Epic> epicsList = new ArrayList<>();
-        for (Epic epic : epics.values()) {
-            epicsList.add(epic);
-        }
-        return epicsList;
+    public List<Epic> getEpics() {
+        return new ArrayList<>(epics.values());
     }
 
     public void clearTask() {
@@ -201,26 +186,16 @@ public class TaskManager {
     }
 
     private void setSubTaskId(SubTask subTask) {
-        subTask.setTaskId(getNextSubTaskId());
+        subTask.setTaskId(getNextTaskId());
     }
 
     private void setEpicId(Epic epic) {
-        epic.setTaskId(getNextEpicId());
+        epic.setTaskId(getNextTaskId());
     }
 
     public int getNextTaskId() {
         nextTaskId += nextTaskId;
         return nextTaskId;
-    }
-
-    public int getNextSubTaskId() {
-        nextSubTaskId += nextSubTaskId;
-        return nextSubTaskId;
-    }
-
-    public int getNextEpicId() {
-        nextEpicId += nextEpicId;
-        return nextEpicId;
     }
 
 }

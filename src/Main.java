@@ -1,5 +1,5 @@
-import Task.*;
-import TaskManager.*;
+import task.*;
+import taskManager.*;
 
 public class Main {
 
@@ -24,7 +24,7 @@ public class Main {
         taskManager.addSubTask(subTask3);
         System.out.println(taskManager.getTasks());
         System.out.println(taskManager.getSubTasks());
-        System.out.println(taskManager.getEpic() + "\n");
+        System.out.println(taskManager.getEpics() + "\n");
         Task task3 = new Task("Сходить в магазин", "Купить воду", TaskStatus.DONE);
         SubTask subTask4 = new SubTask("Разложить все кусочки пазла на столе рубашкой вверх", "Я не " +
                 "люблю это занятие", TaskStatus.NEW, epic1.getTaskId());
@@ -35,11 +35,11 @@ public class Main {
         taskManager.updateSubTask(subTask5, subTask2.getTaskId());
         System.out.println(taskManager.getTasks());
         System.out.println(taskManager.getSubTasks());
-        System.out.println(taskManager.getEpic() + "\n");
+        System.out.println(taskManager.getEpics() + "\n");
         taskManager.removeTaskById(task3.getTaskId());
         taskManager.removeEpicById(epic1.getTaskId());
         System.out.println(taskManager.getTasks());
-        System.out.println(taskManager.getEpic());
+        System.out.println(taskManager.getEpics());
         System.out.println(taskManager.getSubTasks());
     }
 }

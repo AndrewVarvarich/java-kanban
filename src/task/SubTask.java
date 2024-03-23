@@ -1,6 +1,6 @@
-package Task;
+package task;
 
-import TaskManager.*;
+import taskManager.*;
 public class SubTask extends Task {
 
     private int epicId;
@@ -16,5 +16,15 @@ public class SubTask extends Task {
 
     public void setEpicId(int epicId) {
         this.epicId = epicId;
+    }
+
+    @Override
+    public String toString() {
+        return "SubTask{" +
+                "taskId'" + taskId + '\'' +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", status=" + status +
+                '}';
     }
 }

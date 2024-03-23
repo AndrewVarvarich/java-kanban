@@ -1,6 +1,6 @@
-package Task;
+package task;
 
-import TaskManager.*;
+import taskManager.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,5 +24,15 @@ public class Epic extends Task {
 
     public List<Integer> getSubtaskIds() {
         return subtaskIds;
+    }
+
+    @Override
+    public String toString() {
+        return "Epic{" +
+                "taskId'" + taskId + '\'' +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", status=" + status +
+                '}';
     }
 }

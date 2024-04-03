@@ -1,7 +1,6 @@
-package taskmanager;
+package manager;
 
 import task.Task;
-import taskmanager.HistoryManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +8,7 @@ import java.util.List;
 public class InMemoryHistoryManager implements HistoryManager {
 
     private final List<Task> history = new ArrayList<>();
-
+    private int numberElements = 10;
 
     @Override
     public void add(Task task) {
@@ -18,7 +17,7 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public List<Task> getHistory() {
-        while (history.size() > 10) {
+        while (history.size() > numberElements) {
             history.removeFirst();
         }
         return history;

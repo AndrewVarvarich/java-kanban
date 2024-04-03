@@ -1,10 +1,13 @@
-package taskmanager;
+package test;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import task.Epic;
 import task.SubTask;
 import task.Task;
+import manager.Managers;
+import manager.TaskManager;
+import manager.TaskStatus;
 
 import java.util.List;
 

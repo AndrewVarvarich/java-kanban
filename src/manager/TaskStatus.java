@@ -1,4 +1,4 @@
-package taskmanager;
+package manager;
 
 
 public enum TaskStatus {

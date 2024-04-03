@@ -1,4 +1,4 @@
-package taskmanager;
+package manager;
 
 import task.Epic;
 import task.SubTask;
@@ -46,7 +46,6 @@ public interface TaskManager {
 
     List<SubTask> getAllSubtasksForEpic(int epicId);
 
-    int getNextTaskId();
 
     void add(Task task);
 

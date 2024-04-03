@@ -1,9 +1,4 @@
-package taskmanager;
-
-import taskmanager.HistoryManager;
-import taskmanager.InMemoryHistoryManager;
-import taskmanager.InMemoryTaskManager;
-import taskmanager.TaskManager;
+package manager;
 
 public class Managers {
 

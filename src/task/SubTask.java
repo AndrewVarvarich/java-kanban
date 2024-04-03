@@ -1,6 +1,6 @@
 package task;
 
-import taskmanager.*;
+import manager.*;
 public class SubTask extends Task {
 
     private int epicId;

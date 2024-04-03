@@ -1,4 +1,4 @@
-package taskmanager;
+package manager;
 
 import task.*;
 
@@ -219,7 +219,7 @@ public class InMemoryTaskManager implements TaskManager {
         epic.setTaskId(getNextTaskId());
     }
 
-    public int getNextTaskId() {
+    private int getNextTaskId() {
         nextTaskId += nextTaskId;
         return nextTaskId;
     }

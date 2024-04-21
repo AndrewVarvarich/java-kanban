@@ -42,6 +42,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         node.prev = tail;
         tail = node;
     }
+
     @Override
     public ArrayList<Task> getTasksHistory() {
         ArrayList<Task> taskHistory = new ArrayList<>();
@@ -72,27 +73,6 @@ public class InMemoryHistoryManager implements HistoryManager {
         } else {
             tail = node.prev;
         }
-    }
-
-
-    private void removeFirst() {
-        if (head.next == null) {
-            tail = null;
-        } else {
-            head.next.prev = null;
-        }
-
-        head = head.next;
-    }
-
-    private void removeLast() {
-        if (head.next == null) {
-            head = null;
-        } else {
-            tail.prev.next = null;
-        }
-
-        tail = tail.prev;
     }
 
     @Override

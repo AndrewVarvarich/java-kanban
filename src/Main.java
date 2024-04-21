@@ -2,7 +2,6 @@ import task.*;
 import manager.*;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Main {
 
@@ -32,19 +31,19 @@ public class Main {
         taskManager.getSubTaskById(subTask1.getTaskId());
         taskManager.getSubTaskById(subTask2.getTaskId());
         taskManager.getSubTaskById(subTask3.getTaskId());
-        printHistory(taskManager);
+        printHistory();
         taskManager.getTaskById(task1.getTaskId());
-        printHistory(taskManager);
+        printHistory();
         taskManager.getEpicById(epic2.getTaskId());
-        printHistory(taskManager);
+        printHistory();
         taskManager.removeTaskById(task1.getTaskId());
-        printHistory(taskManager);
-//        taskManager.removeEpicById(epic1.getTaskId());
-        printHistory(taskManager);
+        printHistory();
+        taskManager.removeEpicById(epic1.getTaskId());
+        printHistory();
         taskManager.removeSubTaskById(subTask1.getTaskId());
     }
 
-    private static void printHistory(TaskManager manager) {
+    private static void printHistory() {
         System.out.println("\n История:");
         HistoryManager historyManager = Managers.getDefaultHistory();
         ArrayList<Task> arr = historyManager.getTasksHistory();

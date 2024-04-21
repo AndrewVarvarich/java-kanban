@@ -21,18 +21,7 @@ public class Epic extends Task {
 
     public void removeSubTask(int id) {
         List<Integer> intList = subtaskIds;
-        Iterator<Integer> iterator = intList.iterator();
-        while (iterator.hasNext()) {
-            int i = iterator.next();
-            if (i == id) {
-                iterator.remove();
-            }
-        }
-        /*for (Integer ids : subtaskIds) {
-            if (ids == id) {
-                subtaskIds.remove(ids);
-            }
-        }*/
+        intList.removeIf(i -> i == id);
     }
 
     public List<Integer> getSubtaskIds() {

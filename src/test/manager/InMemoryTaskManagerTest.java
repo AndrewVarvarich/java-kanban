@@ -163,9 +163,8 @@ class InMemoryTaskManagerTest {
         SubTask subTask3 = new SubTask("Накрыть на стол", "Не забыть про вино!",
                 TaskStatus.NEW, epic1.getTaskId());
         taskManager.addSubTask(subTask3);
-        List<Integer> arr1 = epic1.getSubtaskIds();
         taskManager.removeSubTaskById(subTask1.getTaskId());
-        List<Integer> arr2 = epic1.getSubtaskIds();
-        assertEquals(2, arr2.size());
+        List<Integer> arr1 = epic1.getSubtaskIds();
+        assertEquals(2, arr1.size());
     }
 }

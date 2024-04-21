@@ -1,21 +1,20 @@
-package test;
+package manager;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import task.Epic;
 import task.SubTask;
 import task.Task;
-import manager.Managers;
-import manager.TaskManager;
-import manager.TaskStatus;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class InMemoryTaskManagerTest {
 
-    private static TaskManager taskManager = Managers.getDefault();
+    private final static TaskManager taskManager = Managers.getDefault();
+    private final static HistoryManager historyManager = Managers.getDefaultHistory();
 
     @BeforeAll
     static void beforeAll() {
@@ -34,9 +33,10 @@ class InMemoryTaskManagerTest {
 
     @Test
     void shouldBePositiveIfTaskIdAreEqual() {
-        for (Task task : taskManager.getTasks())
-        assertEquals(taskManager.getTaskById(task.getTaskId()),(taskManager.getTaskById(task.getTaskId())),
-                "Экземпляры не равны");
+        for (Task task : taskManager.getTasks()) {
+            assertEquals(taskManager.getTaskById(task.getTaskId()), (taskManager.getTaskById(task.getTaskId())),
+                    "Экземпляры не равны");
+        }
     }
 
     @Test
@@ -63,9 +63,9 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void shouldBeNegativeIfIdsAreDifferent() {
+    void shouldBePositiveIfIdsAreDifferent() {
         List<Task> tasks = taskManager.getTasks();
-        assertFalse(tasks.getFirst().getTaskId() == tasks.get(1).getTaskId());
+        assertNotEquals(tasks.getFirst().getTaskId(), tasks.get(1).getTaskId());
     }
 
     @Test
@@ -85,9 +85,8 @@ class InMemoryTaskManagerTest {
         Task task7 = new Task("Купить кровать", "Посмотреть бельё", TaskStatus.IN_PROGRESS);
         taskManager.updateTask(task7, task6.getTaskId());
         taskManager.getTaskById(task7.getTaskId());
-        List<Task> historyTasks = taskManager.getHistory();
-        List<Task> tasks = taskManager.getTasks();
-        assertNotSame(task6, historyTasks.get(1));
+        List<Task> historyTasks = historyManager.getTasksHistory();
+        assertNotSame(task6, historyTasks.getFirst());
     }
 
     @Test
@@ -118,6 +117,55 @@ class InMemoryTaskManagerTest {
         SubTask subTask4 = new SubTask("Попить водички", "Открыть бутылку",
                 TaskStatus.NEW, subTask3.getTaskId());
         assertThrows(NullPointerException.class, () -> taskManager.addSubTask(subTask4));
+    }
 
+    @Test
+    void shouldBePositiveIfRemoveIsWorkingCorrectly() {
+        Task task1 = new Task("Сходить в ресторан", "Покушать салатик", TaskStatus.NEW);
+        taskManager.addTask(task1);
+        Task task2 = new Task("Посетить врача", "Удаление зуба", TaskStatus.NEW);
+        taskManager.addTask(task2);
+        taskManager.getTaskById(task1.getTaskId());
+        taskManager.getTaskById(task2.getTaskId());
+        ArrayList<Task> arr1 = historyManager.getTasksHistory();
+        taskManager.removeTaskById(task1.getTaskId());
+        ArrayList<Task> arr2 = historyManager.getTasksHistory();
+        assertNotEquals(arr1, arr2);
+    }
+
+    @Test
+    void shouldBePositiveIfAdditionIsWorkingCorrectly() {
+        Task task1 = new Task("Выйти поиграть с друзьями", "Взять воды", TaskStatus.NEW);
+        taskManager.addTask(task1);
+        Task task2 = new Task("Запланировать отпуск", "Узнать стоимость билета", TaskStatus.NEW);
+        taskManager.addTask(task2);
+        taskManager.getTaskById(task1.getTaskId());
+        taskManager.getTaskById(task2.getTaskId());
+        ArrayList<Task> arr1 = historyManager.getTasksHistory();
+        Task task3 = new Task("Выгулять собаку", "Не забыть взять с собой игрушки", TaskStatus.NEW);
+        taskManager.addTask(task3);
+        taskManager.getTaskById(task3.getTaskId());
+        ArrayList<Task> arr2 = historyManager.getTasksHistory();
+        assertNotEquals(arr1, arr2);
+    }
+
+    @Test
+    void shouldBePositiveIfEpicDoesntHaveIrrelevantSubtaskIds() {
+        Epic epic1 = new Epic("Приготовить романтический ужин", "Выделить 2 часа на это",
+                TaskStatus.NEW);
+        taskManager.addEpic(epic1);
+        SubTask subTask1 = new SubTask("Купить продуктов на ужин", "Составить список",
+                TaskStatus.NEW, epic1.getTaskId());
+        taskManager.addSubTask(subTask1);
+        SubTask subTask2 = new SubTask("Выложить все продукты на столе и подготовить к приготовлению",
+                "Мыть руки после каждого прикасновения к чему-либо", TaskStatus.NEW, epic1.getTaskId());
+        taskManager.addSubTask(subTask2);
+        SubTask subTask3 = new SubTask("Накрыть на стол", "Не забыть про вино!",
+                TaskStatus.NEW, epic1.getTaskId());
+        taskManager.addSubTask(subTask3);
+        List<Integer> arr1 = epic1.getSubtaskIds();
+        taskManager.removeSubTaskById(subTask1.getTaskId());
+        List<Integer> arr2 = epic1.getSubtaskIds();
+        assertEquals(2, arr2.size());
     }
 }

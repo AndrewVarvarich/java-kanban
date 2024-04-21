@@ -2,6 +2,7 @@ package task;
 
 import manager.*;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class Epic extends Task {
@@ -19,7 +20,19 @@ public class Epic extends Task {
     }
 
     public void removeSubTask(int id) {
-        subtaskIds.remove(id);
+        List<Integer> intList = subtaskIds;
+        Iterator<Integer> iterator = intList.iterator();
+        while (iterator.hasNext()) {
+            int i = iterator.next();
+            if (i == id) {
+                iterator.remove();
+            }
+        }
+        /*for (Integer ids : subtaskIds) {
+            if (ids == id) {
+                subtaskIds.remove(ids);
+            }
+        }*/
     }
 
     public List<Integer> getSubtaskIds() {

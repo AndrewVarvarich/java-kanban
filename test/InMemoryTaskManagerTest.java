@@ -171,6 +171,8 @@ class InMemoryTaskManagerTest {
     @Test
     void shouldBePositiveIfTasksHistoryWorkCorrectly() {
         taskManager.clearTask();
+        taskManager.clearSubTask();
+        taskManager.clearEpic();
         Task task1 = new Task("Поиграть в доту", "Получить жетоны чтобы пройти дальше", TaskStatus.NEW);
         taskManager.addTask(task1);
         Task task2 = new Task("Поиграть в валорант с другом", "Апнуть звание", TaskStatus.NEW);

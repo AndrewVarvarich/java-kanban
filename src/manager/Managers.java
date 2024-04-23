@@ -3,9 +3,13 @@ package manager;
 public class Managers {
 
     private static HistoryManager historyManager;
+    private static InMemoryTaskManager taskManager;
 
     public static TaskManager getDefault() {
-        return new InMemoryTaskManager();
+        if (taskManager == null) {
+            taskManager = new InMemoryTaskManager();
+        }
+        return taskManager;
     }
 
     public static HistoryManager getDefaultHistory() {

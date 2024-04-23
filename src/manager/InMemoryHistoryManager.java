@@ -11,11 +11,6 @@ public class InMemoryHistoryManager implements HistoryManager {
     private Node head;
     private Node tail;
 
-    public InMemoryHistoryManager() {
-        this.head = null;
-        this.tail = null;
-    }
-
     @Override
     public List<Task> getHistory() {
         return history;
@@ -29,7 +24,27 @@ public class InMemoryHistoryManager implements HistoryManager {
         }
     }
 
-    public void linkLast(Node node) {
+    @Override
+    public List<Task> getTasksHistory() {
+        List<Task> taskHistory = new ArrayList<>();
+        Node temp = head;
+
+        while (temp != null) {
+            taskHistory.add(temp.task);
+            temp = temp.next;
+        }
+        return taskHistory;
+    }
+
+    @Override
+    public void add(Task task) {
+        Node node = new Node(task);
+        remove(task.getTaskId());
+        linkLast(node);
+        tasksHistory.put(task.getTaskId(), node);
+    }
+
+    private void linkLast(Node node) {
 
         if (isEmpty()) {
             head = node;
@@ -39,18 +54,6 @@ public class InMemoryHistoryManager implements HistoryManager {
 
         node.prev = tail;
         tail = node;
-    }
-
-    @Override
-    public ArrayList<Task> getTasksHistory() {
-        ArrayList<Task> taskHistory = new ArrayList<>();
-        Node temp = head;
-
-        while (temp != null) {
-            taskHistory.add(temp.task);
-            temp = temp.next;
-        }
-        return taskHistory;
     }
 
     private boolean isEmpty() {
@@ -73,12 +76,30 @@ public class InMemoryHistoryManager implements HistoryManager {
         }
     }
 
-    @Override
-    public void add(Task task) {
-        Node node = new Node(task);
-        remove(task.getTaskId());
-        linkLast(node);
-        tasksHistory.put(task.getTaskId(), node);
+     static class Node {
+
+        public Task task;
+        public Node next;
+        public Node prev;
+
+        public Node(Task task) {
+            this.task = task;
+            this.next = null;
+            this.prev = null;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Node node = (Node) o;
+            return Objects.equals(task, node.task);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(task);
+        }
     }
 }
 

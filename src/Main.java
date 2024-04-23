@@ -1,7 +1,7 @@
 import task.*;
 import manager.*;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class Main {
 
@@ -40,13 +40,12 @@ public class Main {
         printHistory();
         taskManager.removeEpicById(epic1.getTaskId());
         printHistory();
-        taskManager.removeSubTaskById(subTask1.getTaskId());
     }
 
     private static void printHistory() {
         System.out.println("\n История:");
         HistoryManager historyManager = Managers.getDefaultHistory();
-        ArrayList<Task> arr = historyManager.getTasksHistory();
+        List<Task> arr = historyManager.getTasksHistory();
         for (Task task : arr) {
             System.out.println(task.toString());
         }

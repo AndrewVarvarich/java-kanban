@@ -19,6 +19,10 @@ public class SubTask extends Task {
         this.epicId = epicId;
     }
 
+    public void removeEpicId() {
+        this.epicId = 0;
+    }
+
     @Override
     public String toString() {
         return "SubTask{" +

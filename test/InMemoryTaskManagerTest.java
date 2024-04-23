@@ -1,14 +1,10 @@
-import manager.HistoryManager;
-import manager.Managers;
-import manager.TaskManager;
-import manager.TaskStatus;
+import manager.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import task.Epic;
 import task.SubTask;
 import task.Task;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -121,6 +117,7 @@ class InMemoryTaskManagerTest {
         assertThrows(NullPointerException.class, () -> taskManager.addSubTask(subTask4));
     }
 
+    // Метод для проверки того, что встроенный связный список корректно работает при операциях удаления
     @Test
     void shouldBePositiveIfRemoveIsWorkingCorrectly() {
         Task task1 = new Task("Сходить в ресторан", "Покушать салатик", TaskStatus.NEW);
@@ -129,12 +126,13 @@ class InMemoryTaskManagerTest {
         taskManager.addTask(task2);
         taskManager.getTaskById(task1.getTaskId());
         taskManager.getTaskById(task2.getTaskId());
-        ArrayList<Task> arr1 = historyManager.getTasksHistory();
+        List<Task> list1 = historyManager.getTasksHistory();
         taskManager.removeTaskById(task1.getTaskId());
-        ArrayList<Task> arr2 = historyManager.getTasksHistory();
-        assertNotEquals(arr1, arr2);
+        List<Task> list2 = historyManager.getTasksHistory();
+        assertNotEquals(list1, list2);
     }
 
+    // Метод для проверки того, что встроенный связный список корректно работает при операциях добавления
     @Test
     void shouldBePositiveIfAdditionIsWorkingCorrectly() {
         Task task1 = new Task("Выйти поиграть с друзьями", "Взять воды", TaskStatus.NEW);
@@ -143,12 +141,12 @@ class InMemoryTaskManagerTest {
         taskManager.addTask(task2);
         taskManager.getTaskById(task1.getTaskId());
         taskManager.getTaskById(task2.getTaskId());
-        ArrayList<Task> arr1 = historyManager.getTasksHistory();
+        List<Task> list1 = historyManager.getTasksHistory();
         Task task3 = new Task("Выгулять собаку", "Не забыть взять с собой игрушки", TaskStatus.NEW);
         taskManager.addTask(task3);
         taskManager.getTaskById(task3.getTaskId());
-        ArrayList<Task> arr2 = historyManager.getTasksHistory();
-        assertNotEquals(arr1, arr2);
+        List<Task> list2 = historyManager.getTasksHistory();
+        assertNotEquals(list1, list2);
     }
 
     @Test
@@ -168,5 +166,32 @@ class InMemoryTaskManagerTest {
         taskManager.removeSubTaskById(subTask1.getTaskId());
         List<Integer> arr1 = epic1.getSubtaskIds();
         assertEquals(2, arr1.size());
+    }
+
+    @Test
+    void shouldBePositiveIfTasksHistoryWorkCorrectly() {
+        taskManager.clearTask();
+        Task task1 = new Task("Поиграть в доту", "Получить жетоны чтобы пройти дальше", TaskStatus.NEW);
+        taskManager.addTask(task1);
+        Task task2 = new Task("Поиграть в валорант с другом", "Апнуть звание", TaskStatus.NEW);
+        taskManager.addTask(task2);
+        Task task3 = new Task("Приготоваить покушать", "Купить курицу", TaskStatus.NEW);
+        taskManager.addTask(task3);
+        taskManager.getTaskById(task1.getTaskId());
+        taskManager.getTaskById(task2.getTaskId());
+        taskManager.getTaskById(task3.getTaskId());
+        List<Task> list1 = historyManager.getTasksHistory();
+        assertEquals(3, list1.size());
+    }
+
+    @Test
+    void shouldSetEpicIdTo0WhenSubtaskRemove() {
+        Epic epic1 = new Epic("Сделать яичницу", "15 минут", TaskStatus.NEW);
+        taskManager.addEpic(epic1);
+        SubTask subTask1 = new SubTask("Купить яйца", "Потратить не более 100р", TaskStatus.NEW,
+                epic1.getTaskId());
+        taskManager.addSubTask(subTask1);
+        taskManager.removeSubTaskById(subTask1.getTaskId());
+        assertEquals(0, subTask1.getEpicId());
     }
 }

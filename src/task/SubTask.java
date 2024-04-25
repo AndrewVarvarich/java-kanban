@@ -1,6 +1,7 @@
 package task;
 
 import manager.*;
+
 public class SubTask extends Task {
 
     private int epicId;
@@ -16,6 +17,10 @@ public class SubTask extends Task {
 
     public void setEpicId(int epicId) {
         this.epicId = epicId;
+    }
+
+    public void removeEpicId() {
+        this.epicId = 0;
     }
 
     @Override

@@ -17,7 +17,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         this.file = file;
     }
 
-    public static void main(String[] args) throws IOException{
+    public static void main(String[] args) throws IOException {
         Path dir = Files.createDirectories(Paths.get("C://Intel/Java My Projects/java-kanban"));
         Path file = dir.resolve("data.csv");
         FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(file);
@@ -137,7 +137,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     private static Task parseTask(String line) {
         String[] str = line.split(",");
         Task task = null;
-        if (str[0].equals("id")){
+        if (str[0].equals("id")) {
             return null;
         }
         task = switch (str[1]) {

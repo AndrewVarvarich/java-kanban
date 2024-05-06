@@ -88,10 +88,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (!tasks.containsValue(task)) {
             setTaskId(task);
             tasks.put(task.getTaskId(), task);
-        } else {
-            System.out.println("Такая задача уже есть");
         }
-
     }
 
     @Override
@@ -102,8 +99,6 @@ public class InMemoryTaskManager implements TaskManager {
             subTasks.put(subTask.getTaskId(), subTask);
             addSubTaskToEpic(subTask);
             updateEpicStatus(subTask.getEpicId());
-        } else {
-            System.out.println("Такая задача уже есть");
         }
     }
 
@@ -112,8 +107,6 @@ public class InMemoryTaskManager implements TaskManager {
         if (!epics.containsValue(epic)) {
             setEpicId(epic);
             epics.put(epic.getTaskId(), epic);
-        } else {
-            System.out.println("Такая задача уже есть");
         }
     }
 

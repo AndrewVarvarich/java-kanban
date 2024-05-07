@@ -7,10 +7,12 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
-    private static Path file;
+    private Path file;
 
     public FileBackedTaskManager(Path file) {
         super();
@@ -39,6 +41,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 TaskStatus.NEW, epic1.getTaskId());
         fileBackedTaskManager.addSubTask(subTask3);
         FileBackedTaskManager fileBackedTaskManager1 = loadFromFile(file);
+        List<Task> list1 = new ArrayList<>(fileBackedTaskManager.getTasks());
+        List<Task> list2 = new ArrayList<>(fileBackedTaskManager1.getTasks());
+        if (list1.equals(list2)) {
+            System.out.println("Переменные объектов равны, следовательно они идентичны");
+        }
     }
 
     public static FileBackedTaskManager loadFromFile(Path file) {
@@ -66,25 +73,25 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
     }
 
-    public void save() {
+    private void save() {
         try (Writer fileWriter = new FileWriter(file.toFile(), StandardCharsets.UTF_8, false);
              BufferedWriter bw = new BufferedWriter(fileWriter); PrintWriter out = new PrintWriter(bw)) {
             out.println("id,type,name,status,description,epic");
             for (Task task : this.getTasks()) {
-                out.println(toString(task));
+                out.println(parseTask(task));
             }
             for (Task task : this.getEpics()) {
-                out.println(toString(task));
+                out.println(parseTask(task));
             }
             for (Task task : this.getSubTasks()) {
-                out.println(toString(task));
+                out.println(parseTask(task));
             }
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка при записи файла");
         }
     }
 
-    public String toString(Task task) {
+    public String parseTask(Task task) {
         String taskType;
         if (this.getTasks().contains(task)) {
             taskType = TaskType.TASK.toString();
@@ -131,6 +138,48 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     @Override
     public void addEpic(Epic epic) {
         super.addEpic(epic);
+        save();
+    }
+
+    @Override
+    public void removeTaskById(int id) {
+        super.removeTaskById(id);
+        save();
+    }
+
+    @Override
+    public void removeSubTaskById(int id, boolean updateEpic) {
+        super.removeSubTaskById(id, updateEpic);
+        save();
+    }
+
+    @Override
+    public void removeSubTaskById(int id) {
+        super.removeSubTaskById(id);
+        save();
+    }
+
+    @Override
+    public void removeEpicById(int id) {
+        super.removeEpicById(id);
+        save();
+    }
+
+    @Override
+    public void clearTask() {
+        super.clearTask();
+        save();
+    }
+
+    @Override
+    public void clearSubTask() {
+        super.clearSubTask();
+        save();
+    }
+
+    @Override
+    public void clearEpic() {
+        super.clearEpic();
         save();
     }
 

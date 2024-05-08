@@ -37,6 +37,10 @@ public class Task {
         this.status = status;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o)

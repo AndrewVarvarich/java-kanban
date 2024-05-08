@@ -13,11 +13,11 @@ public interface TaskManager {
 
     List<Epic> getEpics();
 
-    void clearTask();
+    void clearTasks();
 
-    void clearSubTask();
+    void clearSubTasks();
 
-    void clearEpic();
+    void clearEpics();
 
     Task getTaskById(int id);
 

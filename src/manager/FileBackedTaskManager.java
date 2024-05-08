@@ -12,7 +12,7 @@ import java.util.List;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
-    private Path file;
+    private final Path file;
 
     public FileBackedTaskManager(Path file) {
         super();
@@ -54,7 +54,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
              BufferedReader br = new BufferedReader(fr)) {
             String line;
             while ((line = br.readLine()) != null) {
-                Task task = parseTask(line);
+                Task task = parseToObject(line);
                 if (task == null) {
                     continue;
                 } else {
@@ -71,44 +71,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка чтения файла");
         }
-    }
-
-    private void save() {
-        try (Writer fileWriter = new FileWriter(file.toFile(), StandardCharsets.UTF_8, false);
-             BufferedWriter bw = new BufferedWriter(fileWriter); PrintWriter out = new PrintWriter(bw)) {
-            out.println("id,type,name,status,description,epic");
-            for (Task task : this.getTasks()) {
-                out.println(parseTask(task));
-            }
-            for (Task task : this.getEpics()) {
-                out.println(parseTask(task));
-            }
-            for (Task task : this.getSubTasks()) {
-                out.println(parseTask(task));
-            }
-        } catch (IOException e) {
-            throw new ManagerSaveException("Ошибка при записи файла");
-        }
-    }
-
-    public String parseTask(Task task) {
-        String taskType;
-        if (this.getTasks().contains(task)) {
-            taskType = TaskType.TASK.toString();
-        } else if (this.getSubTasks().contains(task)) {
-            taskType = TaskType.SUBTASK.toString();
-        } else {
-            taskType = TaskType.EPIC.toString();
-        }
-
-        String str = String.format("%s,%s,%s,%s,%s", task.getTaskId(), taskType.toUpperCase(), task.getName(),
-                task.getStatus().toString(), task.getDescription());
-
-        if (this.getSubTasks().contains(task)) {
-            SubTask subTask = this.getSubTaskById(task.getTaskId());
-            str += "," + subTask.getEpicId();
-        }
-        return str;
     }
 
     private static TaskStatus getStatusFromTask(String str) {
@@ -166,24 +128,24 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void clearTask() {
-        super.clearTask();
+    public void clearTasks() {
+        super.clearTasks();
         save();
     }
 
     @Override
-    public void clearSubTask() {
-        super.clearSubTask();
+    public void clearSubTasks() {
+        super.clearSubTasks();
         save();
     }
 
     @Override
-    public void clearEpic() {
-        super.clearEpic();
+    public void clearEpics() {
+        super.clearEpics();
         save();
     }
 
-    private static Task parseTask(String line) {
+    private static Task parseToObject(String line) {
         String[] str = line.split(",");
         Task task = null;
         if (str[0].equals("id")) {
@@ -197,5 +159,43 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             default -> task;
         };
         return task;
+    }
+
+    private String parseTask(Task task) {
+        String taskType;
+        if (this.getTasks().contains(task)) {
+            taskType = TaskType.TASK.toString();
+        } else if (this.getSubTasks().contains(task)) {
+            taskType = TaskType.SUBTASK.toString();
+        } else {
+            taskType = TaskType.EPIC.toString();
+        }
+
+        String str = String.format("%s,%s,%s,%s,%s", task.getTaskId(), taskType.toUpperCase(), task.getName(),
+                task.getStatus().toString(), task.getDescription());
+
+        if (this.getSubTasks().contains(task)) {
+            SubTask subTask = this.getSubTaskById(task.getTaskId());
+            str += "," + subTask.getEpicId();
+        }
+        return str;
+    }
+
+    private void save() {
+        try (Writer fileWriter = new FileWriter(file.toFile(), StandardCharsets.UTF_8, false);
+             BufferedWriter bw = new BufferedWriter(fileWriter); PrintWriter out = new PrintWriter(bw)) {
+            out.println("id,type,name,status,description,epic");
+            for (Task task : this.getTasks()) {
+                out.println(parseTask(task));
+            }
+            for (Task task : this.getEpics()) {
+                out.println(parseTask(task));
+            }
+            for (Task task : this.getSubTasks()) {
+                out.println(parseTask(task));
+            }
+        } catch (IOException e) {
+            throw new ManagerSaveException("Ошибка при записи файла");
+        }
     }
 }

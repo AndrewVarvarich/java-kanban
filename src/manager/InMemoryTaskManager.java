@@ -38,7 +38,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void clearTask() {
+    public void clearTasks() {
         List<Task> removeList = getTasks();
         for (Task task : removeList) {
             historyManager.remove(task.getTaskId());
@@ -47,7 +47,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void clearSubTask() {
+    public void clearSubTasks() {
         List<SubTask> removeList = getSubTasks();
         for (Task task : removeList) {
             historyManager.remove(task.getTaskId());
@@ -56,7 +56,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void clearEpic() {
+    public void clearEpics() {
         List<Epic> removeList = getEpics();
         for (Task task : removeList) {
             historyManager.remove(task.getTaskId());

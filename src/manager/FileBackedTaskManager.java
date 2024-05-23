@@ -4,11 +4,10 @@ import task.*;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
@@ -17,35 +16,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public FileBackedTaskManager(Path file) {
         super();
         this.file = file;
-    }
-
-    public static void main(String[] args) throws IOException {
-        Path dir = Files.createDirectories(Paths.get("C://Intel/Java My Projects/java-kanban"));
-        Path file = dir.resolve("data.csv");
-        FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(file);
-        Task task1 = new Task("Сходить в магазин", "Купить воду", TaskStatus.NEW);
-        fileBackedTaskManager.addTask(task1);
-        Task task2 = new Task("Посетить врача", "Удаление зуба", TaskStatus.NEW);
-        fileBackedTaskManager.addTask(task2);
-        Epic epic1 = new Epic("Собрать пазл", "Выделить 2 часа на это", TaskStatus.NEW);
-        fileBackedTaskManager.addEpic(epic1);
-        Epic epic2 = new Epic("Собрать компьютер", "Нужна помощь друзей", TaskStatus.NEW);
-        fileBackedTaskManager.addEpic(epic2);
-        SubTask subTask1 = new SubTask("Разложить все кусочки пазла на столе рубашкой вверх", "Я не " +
-                "люблю это занятие", TaskStatus.NEW, epic1.getTaskId());
-        fileBackedTaskManager.addSubTask(subTask1);
-        SubTask subTask2 = new SubTask("Соединить все кусочки в картинку", "Не сломать кусочки",
-                TaskStatus.NEW, epic1.getTaskId());
-        fileBackedTaskManager.addSubTask(subTask2);
-        SubTask subTask3 = new SubTask("Позвать друзей и собрать пазл", "Не забыть про напитки",
-                TaskStatus.NEW, epic1.getTaskId());
-        fileBackedTaskManager.addSubTask(subTask3);
-        FileBackedTaskManager fileBackedTaskManager1 = loadFromFile(file);
-        List<Task> list1 = new ArrayList<>(fileBackedTaskManager.getTasks());
-        List<Task> list2 = new ArrayList<>(fileBackedTaskManager1.getTasks());
-        if (list1.equals(list2)) {
-            System.out.println("Переменные объектов равны, следовательно они идентичны");
-        }
     }
 
     public static FileBackedTaskManager loadFromFile(Path file) {
@@ -140,22 +110,39 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     private static Task parseToObject(String line) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yy HH:mm:ss");
         String[] str = line.split(",");
         Task task = null;
         if (str[0].equals("id")) {
             return null;
         }
-        task = switch (str[1]) {
-            case "TASK" -> new Task(str[2], str[4], getStatusFromTask(str[3]));
-            case "SUBTASK" -> new SubTask(str[2], str[4], getStatusFromTask(str[3]),
-                    Integer.parseInt(str[5]));
-            case "EPIC" -> new Epic(str[2], str[4], getStatusFromTask(str[3]));
-            default -> task;
-        };
+        switch (str[1]) {
+            case "TASK":
+                task = new Task(str[2], str[4], getStatusFromTask(str[3]));
+                Duration durationT = Duration.parse(str[5]);
+                task.setDuration(durationT);
+                LocalDateTime startTimeTask = LocalDateTime.parse(str[6], formatter);
+                task.setStartTime(startTimeTask);
+                break;
+            case "SUBTASK":
+                task = new SubTask(str[2], str[4], getStatusFromTask(str[3]),
+                    Integer.parseInt(str[7]));
+                Duration durationS = Duration.parse(str[5]);
+                task.setDuration(durationS);
+                LocalDateTime startTimeSubTask = LocalDateTime.parse(str[6], formatter);
+                task.setStartTime(startTimeSubTask);
+                break;
+            case "EPIC":
+                task = new Epic(str[2], str[4], getStatusFromTask(str[3]));
+                break;
+            default:
+                break;
+        }
         return task;
     }
 
     private String parseTask(Task task) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yy HH:mm:ss");
         String taskType;
         if (this.getTasks().contains(task)) {
             taskType = TaskType.TASK.toString();
@@ -164,13 +151,19 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         } else {
             taskType = TaskType.EPIC.toString();
         }
+        String str;
+        if (this.getEpics().contains(task)) {
+            str = String.format("%s,%s,%s,%s,%s", task.getTaskId(), taskType.toUpperCase(), task.getName(),
+                    task.getStatus().toString(), task.getDescription());
+        } else {
+            str = String.format("%s,%s,%s,%s,%s,%s,%s", task.getTaskId(), taskType.toUpperCase(), task.getName(),
+                    task.getStatus().toString(), task.getDescription(), task.getDuration(),
+                    task.getStartTime().format(formatter));
 
-        String str = String.format("%s,%s,%s,%s,%s", task.getTaskId(), taskType.toUpperCase(), task.getName(),
-                task.getStatus().toString(), task.getDescription());
-
-        if (this.getSubTasks().contains(task)) {
-            SubTask subTask = this.getSubTaskById(task.getTaskId());
-            str += "," + subTask.getEpicId();
+            if (this.getSubTasks().contains(task)) {
+                SubTask subTask = this.getSubTaskById(task.getTaskId());
+                str += "," + subTask.getEpicId();
+            }
         }
         return str;
     }
@@ -178,7 +171,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     private void save() {
         try (Writer fileWriter = new FileWriter(file.toFile(), StandardCharsets.UTF_8, false);
              BufferedWriter bw = new BufferedWriter(fileWriter); PrintWriter out = new PrintWriter(bw)) {
-            out.println("id,type,name,status,description,epic");
+            out.println("id,type,name,status,description,duration,startTime,epic");
             for (Task task : this.getTasks()) {
                 out.println(parseTask(task));
             }

@@ -6,14 +6,13 @@ import java.util.*;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
-    private final List<Task> history = new ArrayList<>();
     private final Map<Integer, Node> tasksHistory = new HashMap<>();
     private Node head;
     private Node tail;
 
     @Override
-    public List<Task> getHistory() {
-        return history;
+    public Map<Integer, Node> getHistory() {
+        return tasksHistory;
     }
 
     @Override
@@ -88,7 +87,11 @@ public class InMemoryHistoryManager implements HistoryManager {
             this.prev = null;
         }
 
-        @Override
+         public Task getTask() {
+             return task;
+         }
+
+         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;

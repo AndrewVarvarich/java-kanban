@@ -14,11 +14,17 @@ public class InMemoryHistoryManagerTest {
 
     @Test
     public void shouldBePassIfHistoryIsEmpty() {
+        for (Task task : historyManager.getTasksHistory()) {
+            historyManager.remove(task.getTaskId());
+        }
         assertTrue(historyManager.getHistory().isEmpty());
     }
 
     @Test
     public void shouldBePositiveIfThereIsNoDuplication() {
+        for (Task task : historyManager.getTasksHistory()) {
+            historyManager.remove(task.getTaskId());
+        }
         Task task1 = new Task("Выйти поиграть с друзьями", "Взять воды", TaskStatus.NEW);
         task1.setStartTime(LocalDateTime.of(2015, 5, 6, 1, 1));
         task1.setDuration(Duration.of(1, ChronoUnit.MINUTES));
@@ -35,6 +41,7 @@ public class InMemoryHistoryManagerTest {
 
     @Test
     public void shouldRemoveFromHistory() {
+        taskManager.clearTasks();
         Task task1 = new Task("Сходить в магазин", "Купить воду", TaskStatus.NEW);
         task1.setDuration(Duration.of(1, ChronoUnit.MINUTES));
         task1.setStartTime(LocalDateTime.of(1999, 1, 1, 10, 0));

@@ -31,6 +31,7 @@ public class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager
 
     @Test
     public void areTheTaskCrossTest() {
+        taskManager.clearTasks();
         Task task1 = new Task("Выйти поиграть с друзьями", "Взять воды", TaskStatus.NEW);
         task1.setStartTime(LocalDateTime.of(2000, 1, 6, 1, 1));
         task1.setDuration(Duration.of(1, ChronoUnit.MINUTES));

@@ -2,9 +2,6 @@ package task;
 
 import manager.*;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
-
 public class SubTask extends Task {
 
     private int epicId;
@@ -25,7 +22,6 @@ public class SubTask extends Task {
     public void removeEpicId() {
         this.epicId = 0;
     }
-
 
     @Override
     public String toString() {

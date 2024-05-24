@@ -6,7 +6,6 @@ import task.Task;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public interface TaskManager {
@@ -50,7 +49,7 @@ public interface TaskManager {
 
     void add(Task task);
 
-    Map<Integer, InMemoryHistoryManager.Node> getHistory();
+    List<Task> getHistory();
 
     Set<Task> getPrioritizedTasks();
 

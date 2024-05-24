@@ -12,6 +12,7 @@ import java.time.format.DateTimeFormatter;
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private final Path file;
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yy HH:mm:ss");
 
     public FileBackedTaskManager(Path file) {
         super();
@@ -110,30 +111,47 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     private static Task parseToObject(String line) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yy HH:mm:ss");
         String[] str = line.split(",");
         Task task = null;
-        if (str[0].equals("id")) {
+        String firstElement = str[0];
+        String typeTask = str[1];
+        String nameTask = str[2];
+        String taskStatus = str[3];
+        String taskDescription = str[4];
+        String taskDuration = null;
+        String taskStartTime = null;
+        String epicIdForSubTask = null;
+
+        if (firstElement.equals("id")) {
             return null;
         }
-        switch (str[1]) {
+        if (str.length > 6 && !str[5].isEmpty()) {
+            taskDuration = str[5];
+        }
+        if (str.length >= 7 && !str[6].isEmpty()) {
+            taskStartTime = str[6];
+        }
+        if (str.length == 8) {
+            epicIdForSubTask = str[7];
+        }
+        switch (typeTask) {
             case "TASK":
-                task = new Task(str[2], str[4], getStatusFromTask(str[3]));
-                Duration durationT = Duration.parse(str[5]);
+                task = new Task(nameTask, taskDescription, getStatusFromTask(taskStatus));
+                Duration durationT = Duration.parse(taskDuration);
                 task.setDuration(durationT);
-                LocalDateTime startTimeTask = LocalDateTime.parse(str[6], formatter);
+                LocalDateTime startTimeTask = LocalDateTime.parse(taskStartTime, formatter);
                 task.setStartTime(startTimeTask);
                 break;
             case "SUBTASK":
-                task = new SubTask(str[2], str[4], getStatusFromTask(str[3]),
-                    Integer.parseInt(str[7]));
-                Duration durationS = Duration.parse(str[5]);
+                task = new SubTask(nameTask, taskDescription, getStatusFromTask(taskStatus),
+                    Integer.parseInt(epicIdForSubTask));
+                Duration durationS = Duration.parse(taskDuration);
                 task.setDuration(durationS);
-                LocalDateTime startTimeSubTask = LocalDateTime.parse(str[6], formatter);
+                LocalDateTime startTimeSubTask = LocalDateTime.parse(taskStartTime, formatter);
                 task.setStartTime(startTimeSubTask);
                 break;
             case "EPIC":
-                task = new Epic(str[2], str[4], getStatusFromTask(str[3]));
+                task = new Epic(nameTask, taskDescription, getStatusFromTask(taskStatus));
                 break;
             default:
                 break;
@@ -141,7 +159,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return task;
     }
 
-    private String parseTask(Task task) {
+    private String convertTaskToString(Task task) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yy HH:mm:ss");
         String taskType;
         if (this.getTasks().contains(task)) {
@@ -173,13 +191,13 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
              BufferedWriter bw = new BufferedWriter(fileWriter); PrintWriter out = new PrintWriter(bw)) {
             out.println("id,type,name,status,description,duration,startTime,epic");
             for (Task task : this.getTasks()) {
-                out.println(parseTask(task));
+                out.println(convertTaskToString(task));
             }
             for (Task task : this.getEpics()) {
-                out.println(parseTask(task));
+                out.println(convertTaskToString(task));
             }
             for (Task task : this.getSubTasks()) {
-                out.println(parseTask(task));
+                out.println(convertTaskToString(task));
             }
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка при записи файла");

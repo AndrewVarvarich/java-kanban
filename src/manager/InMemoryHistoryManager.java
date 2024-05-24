@@ -11,8 +11,12 @@ public class InMemoryHistoryManager implements HistoryManager {
     private Node tail;
 
     @Override
-    public Map<Integer, Node> getHistory() {
-        return tasksHistory;
+    public List<Task> getHistory() {
+        List<Task> history = new ArrayList<>();
+        for (Node node : tasksHistory.values()) {
+            history.add(node.task);
+        }
+        return history;
     }
 
     @Override

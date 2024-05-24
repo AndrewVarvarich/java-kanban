@@ -36,12 +36,11 @@ public class InMemoryHistoryManagerTest {
         taskManager.getTaskById(task1.getTaskId());
         taskManager.getTaskById(task2.getTaskId());
         taskManager.getTaskById(task1.getTaskId());
-        assertEquals(2L, historyManager.getHistory().values().size());
+        assertEquals(2L, historyManager.getHistory().size());
     }
 
     @Test
     public void shouldRemoveFromHistory() {
-        taskManager.clearTasks();
         Task task1 = new Task("Сходить в магазин", "Купить воду", TaskStatus.NEW);
         task1.setDuration(Duration.of(1, ChronoUnit.MINUTES));
         task1.setStartTime(LocalDateTime.of(1999, 1, 1, 10, 0));
@@ -60,12 +59,12 @@ public class InMemoryHistoryManagerTest {
         taskManager.getTaskById(task3.getTaskId());
 
         taskManager.removeTaskById(task1.getTaskId());
-        assertNull(historyManager.getHistory().get(task1.getTaskId()));
+        assertThrows(IndexOutOfBoundsException.class, () -> historyManager.getHistory().get(task1.getTaskId()));
 
         taskManager.removeTaskById(task2.getTaskId());
-        assertNull(historyManager.getHistory().get(task2.getTaskId()));
+        assertThrows(IndexOutOfBoundsException.class, () -> historyManager.getHistory().get(task2.getTaskId()));
 
         taskManager.removeTaskById(task3.getTaskId());
-        assertNull(historyManager.getHistory().get(task3.getTaskId()));
+        assertThrows(IndexOutOfBoundsException.class, () -> historyManager.getHistory().get(task3.getTaskId()));
     }
 }

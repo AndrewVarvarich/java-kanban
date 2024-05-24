@@ -194,7 +194,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Map<Integer, InMemoryHistoryManager.Node> getHistory() {
+    public List<Task> getHistory() {
         return historyManager.getHistory();
     }
 
@@ -227,28 +227,26 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Set<Task> getPrioritizedTasks() {
         if (!prioritizedTasks.isEmpty()) {
-            prioritizedTasks.addAll(
-                    tasks.values().stream()
+            List<Task> tasksWithStartTime = tasks.values().stream()
                             .filter(task -> task.getStartTime() != null)
-                            .toList()
-            );
+                            .toList();
 
-            prioritizedTasks.addAll(
-                    subTasks.values().stream()
+            List<SubTask> subTasksWithStartTime = subTasks.values().stream()
                             .filter(subTask -> subTask.getStartTime() != null)
-                            .toList()
-            );
+                            .toList();
 
-            prioritizedTasks.addAll(
-                    epics.values().stream()
+            List<Epic> epicsWithStartTime = epics.values().stream()
                             .filter(epic -> epic.getStartTime() != null)
-                            .toList()
-            );
+                            .toList();
+
+            prioritizedTasks.addAll(tasksWithStartTime);
+            prioritizedTasks.addAll(subTasksWithStartTime);
+            prioritizedTasks.addAll(epicsWithStartTime);
+
             return prioritizedTasks;
         } else {
             return new TreeSet<>();
         }
-
     }
 
     private boolean areTheTaskCross(Task task) {

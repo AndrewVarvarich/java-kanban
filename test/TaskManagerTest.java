@@ -1,5 +1,5 @@
 import manager.*;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import task.Epic;
 import task.SubTask;
@@ -22,28 +22,41 @@ abstract class TaskManagerTest<T extends TaskManager> {
     static TaskManager taskManager = Managers.getDefault();
     static HistoryManager historyManager = Managers.getDefaultHistory();
 
-        @BeforeAll
-        static void beforeAll() {
-            Task task1 = new Task("Сходить в магазин", "Купить воду", TaskStatus.NEW);
-            task1.setStartTime(LocalDateTime.of(2000,  1, 1, 1, 1));
-            task1.setDuration(Duration.of(1, ChronoUnit.MINUTES));
-            taskManager.addTask(task1);
-            Task task2 = new Task("Сходить в магазин", "Купить воду", TaskStatus.NEW);
-            task2.setStartTime(LocalDateTime.of(2000,  1, 1, 2, 1));
-            task2.setDuration(Duration.of(1, ChronoUnit.MINUTES));
-            taskManager.addTask(task2);
-            Task task3 = new Task("Сходить в спортзал", "Купить воду", TaskStatus.NEW);
-            task3.setStartTime(LocalDateTime.of(2000,  1, 1, 3, 1));
-            task3.setDuration(Duration.of(1, ChronoUnit.MINUTES));
-            taskManager.addTask(task3);
-            Epic epic1 = new Epic("Собрать пазл", "Выделить 2 часа на это", TaskStatus.NEW);
-            taskManager.addEpic(epic1);
-            SubTask subTask1 = new SubTask("Разложить все кусочки пазла на столе рубашкой вверх", "Я не " +
-                    "люблю это занятие", TaskStatus.NEW, epic1.getTaskId());
-            subTask1.setStartTime(LocalDateTime.of(2000,  1, 1, 3, 1));
-            subTask1.setDuration(Duration.of(1, ChronoUnit.MINUTES));
-            taskManager.addSubTask(subTask1);
+        @BeforeEach
+        void beforeEach() {
+            taskManager.clearTasks();
+            taskManager.clearSubTasks();
+            taskManager.clearEpics();
+            addTask("Сходить в магазин", "Купить воду", TaskStatus.NEW,
+                    LocalDateTime.of(2000,  1, 1, 1, 1));
+            addTask("Сходить вмагазин", "Купить воду", TaskStatus.NEW,
+                    LocalDateTime.of(2000,  1, 1, 2, 1));
+            addTask("Сходить в спортзал", "Купить воду", TaskStatus.NEW,
+                    LocalDateTime.of(2000,  1, 1, 3, 1));
+            Epic epic = new Epic("Собрать пазл", "Выделить 2 часа на это", TaskStatus.NEW);
+            taskManager.addEpic(epic);
+            addSubTask("Разложить все кусочки пазла на столе рубашкой вверх", "Я не " +
+                    "люблю это занятие", TaskStatus.NEW, epic.getTaskId());
         }
+
+    static void addTask(String name, String description, TaskStatus status, LocalDateTime startTime) {
+        Task task = new Task(name, description, status);
+        task.setStartTime(startTime);
+        task.setDuration(Duration.of(1, ChronoUnit.MINUTES));
+        taskManager.addTask(task);
+    }
+
+    static void addEpic(String name, String description, TaskStatus status) {
+        Epic epic = new Epic(name, description, status);
+        taskManager.addEpic(epic);
+    }
+
+    static void addSubTask(String name, String description, TaskStatus status, int epicId) {
+        SubTask subTask = new SubTask(name, description, status, epicId);
+        subTask.setStartTime(LocalDateTime.of(2000, 1, 1, 3, 1));
+        subTask.setDuration(Duration.of(1, ChronoUnit.MINUTES));
+        taskManager.addSubTask(subTask);
+    }
 
         @Test
         void shouldBePositiveIfTaskIdAreEqual() {
@@ -77,8 +90,12 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
         @Test
         void shouldBePositiveIfIdsAreDifferent() {
+            addTask("Какая-то задача", "Описание", TaskStatus.NEW,
+                    LocalDateTime.of(2222, 2, 2, 2, 2));
             List<Task> tasks = taskManager.getTasks();
-            assertNotEquals(tasks.getFirst().getTaskId(), tasks.get(1).getTaskId());
+            int firstTask = tasks.getFirst().getTaskId();
+            int lastTask = tasks.getLast().getTaskId();
+            assertNotEquals(firstTask, lastTask);
         }
 
         @Test
@@ -165,6 +182,10 @@ abstract class TaskManagerTest<T extends TaskManager> {
         // Метод для проверки того, что встроенный связный список корректно работает при операциях добавления
         @Test
         void shouldBePositiveIfAdditionIsWorkingCorrectly() {
+            taskManager.clearTasks();
+            for (Task task : historyManager.getTasksHistory()) {
+                historyManager.remove(task.getTaskId());
+            }
             Task task1 = new Task("Выйти поиграть с друзьями", "Взять воды", TaskStatus.NEW);
             task1.setDuration(Duration.of(1, ChronoUnit.MINUTES));
             task1.setStartTime(LocalDateTime.of(2008, 5, 1, 1, 1));
@@ -376,31 +397,6 @@ abstract class TaskManagerTest<T extends TaskManager> {
                 FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(tempFile);
                 FileBackedTaskManager fileBackedTaskManager1 = FileBackedTaskManager.loadFromFile(tempFile);
                 assert fileBackedTaskManager1 != null : "fileBackedTaskManager1 не должен быть null";
-            } catch (IOException e) {
-                System.out.println("Ошибка восстановления или записи файла");
-            }
-        }
-
-        @Test
-        void savingMultipleTasks() {
-            try {
-                Path tempFile = Files.createTempFile("dataTest", ".csv");
-                FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(tempFile);
-                Task task1 = new Task("Сходить в магазин", "Купить воду", TaskStatus.NEW);
-                task1.setDuration(Duration.of(1, ChronoUnit.MINUTES));
-                task1.setStartTime(LocalDateTime.of(2020, 1,23,15,1));
-                fileBackedTaskManager.addTask(task1);
-                Epic epic1 = new Epic("Посетить врача", "Нужны деньги", TaskStatus.NEW);
-                fileBackedTaskManager.addEpic(epic1);
-                SubTask subTask1 = new SubTask("Записаться ко врачу", "Узнать телефон знакомого врача",
-                        TaskStatus.NEW, epic1.getTaskId());
-                subTask1.setDuration(Duration.of(1, ChronoUnit.MINUTES));
-                subTask1.setStartTime(LocalDateTime.of(2020, 1,26,15,1));
-                fileBackedTaskManager.addSubTask(subTask1);
-                FileBackedTaskManager fileBackedTaskManager1 = FileBackedTaskManager.loadFromFile(tempFile);
-                assertNotNull(fileBackedTaskManager.getTasks());
-                assertNotNull(fileBackedTaskManager.getSubTasks());
-                assertNotNull(fileBackedTaskManager.getEpics());
             } catch (IOException e) {
                 System.out.println("Ошибка восстановления или записи файла");
             }

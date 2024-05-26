@@ -4,7 +4,9 @@ import task.Epic;
 import task.SubTask;
 import task.Task;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 public interface TaskManager {
     List<Task> getTasks();
@@ -25,7 +27,7 @@ public interface TaskManager {
 
     Epic getEpicById(int id);
 
-    //
+
     void addTask(Task task);
 
     void addSubTask(SubTask subTask);
@@ -48,4 +50,8 @@ public interface TaskManager {
     void add(Task task);
 
     List<Task> getHistory();
+
+    Set<Task> getPrioritizedTasks();
+
+    LocalDateTime getEpicEndTime(int epicId);
 }

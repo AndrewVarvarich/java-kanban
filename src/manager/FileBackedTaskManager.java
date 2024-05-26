@@ -12,7 +12,7 @@ import java.time.format.DateTimeFormatter;
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private final Path file;
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yy HH:mm:ss");
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yy HH:mm:ss");
 
     public FileBackedTaskManager(Path file) {
         super();
@@ -139,7 +139,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 task = new Task(nameTask, taskDescription, getStatusFromTask(taskStatus));
                 Duration durationT = Duration.parse(taskDuration);
                 task.setDuration(durationT);
-                LocalDateTime startTimeTask = LocalDateTime.parse(taskStartTime, formatter);
+                LocalDateTime startTimeTask = LocalDateTime.parse(taskStartTime, FORMATTER);
                 task.setStartTime(startTimeTask);
                 break;
             case "SUBTASK":
@@ -147,7 +147,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     Integer.parseInt(epicIdForSubTask));
                 Duration durationS = Duration.parse(taskDuration);
                 task.setDuration(durationS);
-                LocalDateTime startTimeSubTask = LocalDateTime.parse(taskStartTime, formatter);
+                LocalDateTime startTimeSubTask = LocalDateTime.parse(taskStartTime, FORMATTER);
                 task.setStartTime(startTimeSubTask);
                 break;
             case "EPIC":
@@ -160,7 +160,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     private String convertTaskToString(Task task) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yy HH:mm:ss");
         String taskType;
         if (this.getTasks().contains(task)) {
             taskType = TaskType.TASK.toString();
@@ -176,7 +175,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         } else {
             str = String.format("%s,%s,%s,%s,%s,%s,%s", task.getTaskId(), taskType.toUpperCase(), task.getName(),
                     task.getStatus().toString(), task.getDescription(), task.getDuration(),
-                    task.getStartTime().format(formatter));
+                    task.getStartTime().format(FORMATTER));
 
             if (this.getSubTasks().contains(task)) {
                 SubTask subTask = this.getSubTaskById(task.getTaskId());

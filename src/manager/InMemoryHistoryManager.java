@@ -3,6 +3,7 @@ package manager;
 import task.Task;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
@@ -12,11 +13,9 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public List<Task> getHistory() {
-        List<Task> history = new ArrayList<>();
-        for (Node node : tasksHistory.values()) {
-            history.add(node.task);
-        }
-        return history;
+        return tasksHistory.values().stream()
+                .map(node -> node.task)
+                .collect(Collectors.toList());
     }
 
     @Override

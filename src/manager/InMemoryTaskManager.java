@@ -287,9 +287,6 @@ public class InMemoryTaskManager implements TaskManager {
             LocalDateTime existingTaskStart = task1.getStartTime();
             LocalDateTime existingTaskEnd = existingTaskStart.plus(task1.getDuration());
 
-            System.out.println("New task: " + newTaskStart + " - " + newTaskEnd);
-            System.out.println("Existing task: " + existingTaskStart + " - " + existingTaskEnd);
-
             if (newTaskStart.isBefore(existingTaskEnd) && newTaskEnd.isAfter(existingTaskStart)) {
                 return true;
             }

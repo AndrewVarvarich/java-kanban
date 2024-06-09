@@ -1,5 +1,6 @@
 package manager;
 
+import exceptions.ManagerSaveException;
 import task.*;
 
 import java.io.*;
@@ -27,7 +28,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             while ((line = br.readLine()) != null) {
                 Task task = parseToObject(line);
                 if (task == null) {
-                    continue;
                 } else {
                     if (task instanceof Epic) {
                         fileBackedTaskManager.addEpic((Epic) task);

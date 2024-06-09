@@ -1,4 +1,4 @@
-package webAPI;
+package webapi;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;

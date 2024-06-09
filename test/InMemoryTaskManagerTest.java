@@ -143,6 +143,66 @@ public class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager
     }
 
     @Test
+    public void shouldBePositiveIfEpicStatusIN_PROGRESS() {
+        taskManager.clearTasks();
+        taskManager.clearSubTasks();
+        taskManager.clearEpics();
+
+        Epic epic1 = new Epic("Сдать проект", "Убедиться что материал подготовлен", TaskStatus.NEW);
+        taskManager.addEpic(epic1);
+        SubTask sTask1 = new SubTask("Провести исследование", "Собрать ископаемые", TaskStatus.DONE,
+                epic1.getTaskId());
+        sTask1.setDuration(Duration.ofMinutes(1));
+        sTask1.setStartTime(LocalDateTime.of(2026, 5, 19, 9, 0));
+        taskManager.addSubTask(sTask1);
+        SubTask sTask2 = new SubTask("Записать результаты исследования", "Детально описать ископаемые",
+                TaskStatus.NEW, epic1.getTaskId());
+        sTask2.setDuration(Duration.ofMinutes(2));
+        sTask2.setStartTime(LocalDateTime.of(2027, 5, 20, 11, 0));
+        taskManager.addSubTask(sTask2);
+        SubTask sTask3 = new SubTask("Подготовить доклад и презентацию", "Распределить задачи по " +
+                "группе", TaskStatus.DONE, epic1.getTaskId());
+        sTask3.setDuration(Duration.ofMinutes(3));
+        sTask3.setStartTime(LocalDateTime.of(2028, 5, 21, 13, 0));
+        taskManager.addSubTask(sTask3);
+        assertEquals(epic1.getStatus(), TaskStatus.IN_PROGRESS);
+    }
+
+    @Test
+    public void shouldBePositiveIfRemoveIsWorkingCorrectly() {
+        for (Task task : historyManager.getTasksHistory()) {
+            historyManager.remove(task.getTaskId());
+        }
+
+        taskManager.clearTasks();
+        taskManager.clearSubTasks();
+        taskManager.clearEpics();
+
+        Task task1 = new Task("Сходить в ресторан", "Покушать салатик", TaskStatus.NEW);
+        task1.setDuration(Duration.of(1, ChronoUnit.MINUTES));
+        task1.setStartTime(LocalDateTime.of(2008, 5, 1, 1, 1));
+        taskManager.addTask(task1);
+
+        Task task2 = new Task("Посетить врача", "Удаление зуба", TaskStatus.NEW);
+        task2.setDuration(Duration.of(1, ChronoUnit.MINUTES));
+        task2.setStartTime(LocalDateTime.of(2009, 5, 1, 2, 1));
+        taskManager.addTask(task2);
+
+        taskManager.getTaskById(task1.getTaskId());
+        taskManager.getTaskById(task2.getTaskId());
+
+
+        List<Task> list1 = historyManager.getTasksHistory();
+        assertEquals(2, list1.size());
+
+        taskManager.removeTaskById(task1.getTaskId());
+
+        List<Task> list2 = historyManager.getTasksHistory();
+        assertEquals(1, list2.size());
+        assertFalse(list2.contains(task1));
+    }
+
+    @Test
     public void shouldBePositiveIfEpicStatusDONE() {
         taskManager.clearTasks();
         taskManager.clearSubTasks();

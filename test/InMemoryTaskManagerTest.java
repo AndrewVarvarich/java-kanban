@@ -147,26 +147,23 @@ public class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager
         taskManager.clearTasks();
         taskManager.clearSubTasks();
         taskManager.clearEpics();
-        Duration duration = Duration.of(1, ChronoUnit.MINUTES);
-        LocalDateTime date1 = LocalDateTime.of(2026, 5, 19, 9, 0);
-        LocalDateTime date2 = LocalDateTime.of(2027, 5, 20, 11, 0);
-        LocalDateTime date3 = LocalDateTime.of(2028, 5, 21, 13, 0);
+
         Epic epic1 = new Epic("Сдать проект", "Убедиться что материал подготовлен", TaskStatus.NEW);
         taskManager.addEpic(epic1);
         SubTask sTask1 = new SubTask("Провести исследование", "Собрать ископаемые", TaskStatus.DONE,
                 epic1.getTaskId());
-        sTask1.setDuration(duration);
-        sTask1.setStartTime(date3);
+        sTask1.setDuration(Duration.ofMinutes(1));
+        sTask1.setStartTime(LocalDateTime.of(2026, 5, 19, 9, 0));
         taskManager.addSubTask(sTask1);
         SubTask sTask2 = new SubTask("Записать результаты исследования", "Детально описать ископаемые",
                 TaskStatus.NEW, epic1.getTaskId());
-        sTask2.setDuration(duration);
-        sTask2.setStartTime(date2);
+        sTask2.setDuration(Duration.ofMinutes(2));
+        sTask2.setStartTime(LocalDateTime.of(2027, 5, 20, 11, 0));
         taskManager.addSubTask(sTask2);
         SubTask sTask3 = new SubTask("Подготовить доклад и презентацию", "Распределить задачи по " +
                 "группе", TaskStatus.DONE, epic1.getTaskId());
-        sTask3.setDuration(duration);
-        sTask3.setStartTime(date1);
+        sTask3.setDuration(Duration.ofMinutes(3));
+        sTask3.setStartTime(LocalDateTime.of(2028, 5, 21, 13, 0));
         taskManager.addSubTask(sTask3);
         assertEquals(epic1.getStatus(), TaskStatus.IN_PROGRESS);
     }

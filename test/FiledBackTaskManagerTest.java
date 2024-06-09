@@ -22,14 +22,14 @@ public class FiledBackTaskManagerTest extends TaskManagerTest<FileBackedTaskMana
             FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(tempFile);
             Task task1 = new Task("Сходить в магазин", "Купить воду", TaskStatus.NEW);
             task1.setDuration(Duration.of(1, ChronoUnit.MINUTES));
-            task1.setStartTime(LocalDateTime.of(2020, 1,23,15,1));
+            task1.setStartTime(LocalDateTime.of(2042, 1,23,15,1));
             fileBackedTaskManager.addTask(task1);
             Epic epic1 = new Epic("Посетить врача", "Нужны деньги", TaskStatus.NEW);
             fileBackedTaskManager.addEpic(epic1);
             SubTask subTask1 = new SubTask("Записаться ко врачу", "Узнать телефон знакомого врача",
                     TaskStatus.NEW, epic1.getTaskId());
             subTask1.setDuration(Duration.of(1, ChronoUnit.MINUTES));
-            subTask1.setStartTime(LocalDateTime.of(2020, 1,26,15,1));
+            subTask1.setStartTime(LocalDateTime.of(2043, 1,26,15,1));
             fileBackedTaskManager.addSubTask(subTask1);
             FileBackedTaskManager fileBackedTaskManager1 = FileBackedTaskManager.loadFromFile(tempFile);
             assertNotNull(fileBackedTaskManager.getTasks());

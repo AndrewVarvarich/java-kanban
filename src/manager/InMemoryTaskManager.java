@@ -147,6 +147,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void removeTaskById(int id) {
+        prioritizedTasks.remove(tasks.get(id));
         tasks.remove(id);
         historyManager.remove(id);
     }
@@ -170,6 +171,7 @@ public class InMemoryTaskManager implements TaskManager {
             specificEpic.removeSubTask(removableSubTaskId);
             updateEpicStatus(specificEpicId);
         }
+        prioritizedTasks.remove(removableSubTask);
     }
 
     public void removeEpicById(int id) {
@@ -185,6 +187,7 @@ public class InMemoryTaskManager implements TaskManager {
 
         epics.remove(id);
         historyManager.remove(id);
+        prioritizedTasks.remove(removableEpic);
     }
 
     @Override

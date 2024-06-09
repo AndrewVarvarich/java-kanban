@@ -287,12 +287,28 @@ public class InMemoryTaskManager implements TaskManager {
             LocalDateTime existingTaskStart = task1.getStartTime();
             LocalDateTime existingTaskEnd = existingTaskStart.plus(task1.getDuration());
 
-            if (newTaskStart.isBefore(existingTaskEnd) && newTaskEnd.isAfter(existingTaskStart)) {
+            // Проверяем, что идентификаторы задач не совпадают
+            if (task.getTaskId() != task1.getTaskId() &&
+                    newTaskStart.isBefore(existingTaskEnd) &&
+                    newTaskEnd.isAfter(existingTaskStart)) {
                 return true;
             }
         }
         return false;
     }
+    /*private boolean areTheTaskCross(Task task) {
+        LocalDateTime newTaskStart = task.getStartTime();
+        LocalDateTime newTaskEnd = newTaskStart.plus(task.getDuration());
+        for (Task task1 : getPrioritizedTasks()) {
+            LocalDateTime existingTaskStart = task1.getStartTime();
+            LocalDateTime existingTaskEnd = existingTaskStart.plus(task1.getDuration());
+
+            if (newTaskStart.isBefore(existingTaskEnd) && newTaskEnd.isAfter(existingTaskStart)) {
+                return true;
+            }
+        }
+        return false;
+    }*/
 
     private void addSubTaskToEpic(SubTask subTask) {
         Epic epic = epics.get(subTask.getEpicId());

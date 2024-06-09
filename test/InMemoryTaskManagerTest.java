@@ -17,19 +17,14 @@ public class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager
     @BeforeAll
     public static void setUp() {
         taskManager = new InMemoryTaskManager();
+
     }
 
     @BeforeEach
     public void setting() {
         taskManager.clearTasks();
-        Task task1 = new Task("Выйти поиграть с друзьями", "Взять воды", TaskStatus.NEW);
-        task1.setStartTime(LocalDateTime.of(2000, 1, 6, 1, 1));
-        task1.setDuration(Duration.of(1, ChronoUnit.MINUTES));
-        taskManager.addTask(task1);
-        Task task2 = new Task("Запланировать отпуск", "Узнать стоимость билета", TaskStatus.NEW);
-        task2.setStartTime(LocalDateTime.of(2000, 1, 6, 1, 1));
-        task2.setDuration(Duration.of(1, ChronoUnit.MINUTES));
-        taskManager.add(task2);
+        taskManager.clearSubTasks();
+        taskManager.clearEpics();
     }
 
     @Test

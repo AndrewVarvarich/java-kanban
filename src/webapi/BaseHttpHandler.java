@@ -18,6 +18,7 @@ public class BaseHttpHandler {
     protected void sendInvalidRequest(HttpExchange h, String text) throws IOException {
         sendResponse(h, 400, text);
     }
+
     protected void sendNotFound(HttpExchange h, String text) throws IOException {
         sendResponse(h, 404, text);
     }

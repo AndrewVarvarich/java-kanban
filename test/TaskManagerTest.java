@@ -5,8 +5,6 @@ import task.Epic;
 import task.SubTask;
 import task.Task;
 
-import manager.TaskManager;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,81 +20,54 @@ abstract class TaskManagerTest<T extends TaskManager> {
     static TaskManager taskManager = Managers.getDefault();
     static HistoryManager historyManager = Managers.getDefaultHistory();
 
-        @BeforeEach
-        void beforeEach() {
-            taskManager.clearTasks();
-            taskManager.clearSubTasks();
-            taskManager.clearEpics();
-            addTask("Сходить в магазин", "Купить воду", TaskStatus.NEW,
-                    LocalDateTime.of(2000,  1, 1, 1, 1));
-            addTask("Сходить вмагазин", "Купить воду", TaskStatus.NEW,
-                    LocalDateTime.of(2000,  1, 1, 2, 1));
-            addTask("Сходить в спортзал", "Купить воду", TaskStatus.NEW,
-                    LocalDateTime.of(2000,  1, 1, 3, 1));
-            Epic epic = new Epic("Собрать пазл", "Выделить 2 часа на это", TaskStatus.NEW);
-            taskManager.addEpic(epic);
-            addSubTask("Разложить все кусочки пазла на столе рубашкой вверх", "Я не " +
-                    "люблю это занятие", TaskStatus.NEW, epic.getTaskId());
-        }
-
-    static void addTask(String name, String description, TaskStatus status, LocalDateTime startTime) {
-        Task task = new Task(name, description, status);
-        task.setStartTime(startTime);
-        task.setDuration(Duration.of(1, ChronoUnit.MINUTES));
-        taskManager.addTask(task);
+    @BeforeEach
+    void beforeEach() {
+        taskManager.clearTasks();
+        taskManager.clearSubTasks();
+        taskManager.clearEpics();
     }
 
-    static void addEpic(String name, String description, TaskStatus status) {
-        Epic epic = new Epic(name, description, status);
-        taskManager.addEpic(epic);
+    @Test
+    void shouldBePositiveIfTaskIdAreEqual() {
+        for (Task task : taskManager.getTasks()) {
+            assertEquals(task, taskManager.getTaskById(task.getTaskId()));
+        }
     }
 
-    static void addSubTask(String name, String description, TaskStatus status, int epicId) {
-        SubTask subTask = new SubTask(name, description, status, epicId);
-        subTask.setStartTime(LocalDateTime.of(2000, 1, 1, 3, 1));
-        subTask.setDuration(Duration.of(1, ChronoUnit.MINUTES));
-        taskManager.addSubTask(subTask);
+    @Test
+    void shouldBePositiveIfSubtaskIdAreEqual() {
+        for (SubTask subTask : taskManager.getSubTasks()) {
+            assertEquals(subTask, taskManager.getSubTaskById(subTask.getTaskId()));
+        }
     }
 
-        @Test
-        void shouldBePositiveIfTaskIdAreEqual() {
-            for (Task task : taskManager.getTasks()) {
-                assertEquals(taskManager.getTaskById(task.getTaskId()), (taskManager.getTaskById(task.getTaskId())),
-                        "Экземпляры не равны");
-            }
+    @Test
+    void shouldBePositiveIfEpicIdAreEqual() {
+        for (Epic epic : taskManager.getEpics()) {
+            assertEquals(epic, taskManager.getEpicById(epic.getTaskId()));
         }
+    }
 
-        @Test
-        void shouldBePositiveIfSubtaskIdAreEqual() {
-            for (SubTask subTask : taskManager.getSubTasks()) {
-                assertEquals(taskManager.getSubTaskById(subTask.getTaskId()),
-                        (taskManager.getSubTaskById(subTask.getTaskId())));
-            }
-        }
+    @Test
+    void shouldBePassIfUtilityClassCreateAnObject() {
+        assertNotNull(taskManager);
+    }
 
-        @Test
-        void shouldBePositiveIfEpicIdAreEqual() {
-            for (Epic epic : taskManager.getEpics()) {
-                assertEquals(taskManager.getEpicById(epic.getTaskId()),
-                        (taskManager.getEpicById(epic.getTaskId())));
-            }
-        }
+    @Test
+    void shouldBePositiveIfAddingOverlappingTasksThrowsException() {
+        Task firstTask = new Task("Первая задача", "Описание", TaskStatus.NEW);
+        firstTask.setStartTime(LocalDateTime.of(2222, 2, 2, 2, 2));
+        firstTask.setDuration(Duration.of(1, ChronoUnit.HOURS));
+        taskManager.addTask(firstTask);
 
-        @Test
-        void shouldBePassIfUtilityClassCreateAnObject() {
-            assertNotNull(taskManager);
+        // Попытка добавить задачу, которая пересекается с первой
+        Task overlappingTask = new Task("Вторая задача", "Описание", TaskStatus.NEW);
+        overlappingTask.setStartTime(LocalDateTime.of(2222, 2, 2, 2, 30));
+        overlappingTask.setDuration(Duration.of(1, ChronoUnit.HOURS));
 
-        }
-
-        @Test
-        void shouldBePositiveIfIdsAreDifferent() {
-            addTask("Какая-то задача", "Описание", TaskStatus.NEW,
-                    LocalDateTime.of(2222, 2, 2, 2, 2));
-            List<Task> tasks = taskManager.getTasks();
-            int firstTask = tasks.getFirst().getTaskId();
-            int lastTask = tasks.getLast().getTaskId();
-            assertNotEquals(firstTask, lastTask);
-        }
+        // Проверка, что выбрасывается исключение при попытке добавления
+        assertThrows(IllegalArgumentException.class, () -> taskManager.addTask(overlappingTask));
+    }
 
         @Test
         void shouldBePositiveIfTheObjectHasNoChange() {

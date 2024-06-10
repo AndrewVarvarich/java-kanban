@@ -26,11 +26,11 @@ public class InMemoryHistoryManagerTest {
             historyManager.remove(task.getTaskId());
         }
         Task task1 = new Task("Выйти поиграть с друзьями", "Взять воды", TaskStatus.NEW);
-        task1.setStartTime(LocalDateTime.of(2015, 5, 6, 1, 1));
+        task1.setStartTime(LocalDateTime.of(2037, 5, 6, 1, 1));
         task1.setDuration(Duration.of(1, ChronoUnit.MINUTES));
         taskManager.addTask(task1);
         Task task2 = new Task("Запланировать отпуск", "Узнать стоимость билета", TaskStatus.NEW);
-        task2.setStartTime(LocalDateTime.of(2015, 4, 7, 1, 1));
+        task2.setStartTime(LocalDateTime.of(2038, 4, 7, 1, 1));
         task2.setDuration(Duration.of(1, ChronoUnit.MINUTES));
         taskManager.addTask(task2);
         taskManager.getTaskById(task1.getTaskId());
@@ -43,15 +43,15 @@ public class InMemoryHistoryManagerTest {
     public void shouldRemoveFromHistory() {
         Task task1 = new Task("Сходить в магазин", "Купить воду", TaskStatus.NEW);
         task1.setDuration(Duration.of(1, ChronoUnit.MINUTES));
-        task1.setStartTime(LocalDateTime.of(1999, 1, 1, 10, 0));
+        task1.setStartTime(LocalDateTime.of(2039, 1, 1, 10, 0));
         taskManager.addTask(task1);
         Task task2 = new Task("Сходить в кофешоп", "Купить кофе", TaskStatus.NEW);
         task2.setDuration(Duration.of(1, ChronoUnit.MINUTES));
-        task2.setStartTime(LocalDateTime.of(1999, 2, 1, 10, 0));
+        task2.setStartTime(LocalDateTime.of(2040, 2, 1, 10, 0));
         taskManager.addTask(task2);
         Task task3 = new Task("Сходить в спортзал", "Попить воду", TaskStatus.NEW);
         task3.setDuration(Duration.of(1, ChronoUnit.MINUTES));
-        task3.setStartTime(LocalDateTime.of(1999, 3, 1, 10, 0));
+        task3.setStartTime(LocalDateTime.of(2041, 3, 1, 10, 0));
         taskManager.addTask(task3);
 
         taskManager.getTaskById(task1.getTaskId());

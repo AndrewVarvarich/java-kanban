@@ -16,12 +16,8 @@ public class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager
 
     @BeforeEach
     public void setting() {
-        for (Task task : historyManager.getTasksHistory()) {
-            historyManager.remove(task.getTaskId());
-        }
-        taskManager.clearTasks();
-        taskManager.clearSubTasks();
-        taskManager.clearEpics();
+        clearHistoryManager();
+        clearTaskManager();
     }
 
     @Test
@@ -38,7 +34,6 @@ public class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager
 
     @Test
     public void areTheTaskCrossTest() {
-        taskManager.clearTasks();
         Task task1 = new Task("Выйти поиграть с друзьями", "Взять воды", TaskStatus.NEW);
         task1.setStartTime(LocalDateTime.of(2035, 1, 6, 1, 1));
         task1.setDuration(Duration.of(1, ChronoUnit.MINUTES));
@@ -112,9 +107,6 @@ public class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager
 
     @Test
     public void shouldBePositiveIfEpicStatusIN_PROGRESSWhenSubTaskIN_PROGRESS() {
-        taskManager.clearTasks();
-        taskManager.clearSubTasks();
-        taskManager.clearEpics();
         Duration duration = Duration.of(1, ChronoUnit.HOURS);
         LocalDateTime date1 = LocalDateTime.of(2029, 5, 22, 9, 0);
         LocalDateTime date2 = LocalDateTime.of(2030, 6, 23, 11, 0);
@@ -144,10 +136,6 @@ public class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager
 
     @Test
     public void shouldBePositiveIfEpicStatusIN_PROGRESS() {
-        taskManager.clearTasks();
-        taskManager.clearSubTasks();
-        taskManager.clearEpics();
-
         Epic epic1 = new Epic("Сдать проект", "Убедиться что материал подготовлен", TaskStatus.NEW);
         taskManager.addEpic(epic1);
         SubTask sTask1 = new SubTask("Провести исследование", "Собрать ископаемые", TaskStatus.DONE,
@@ -170,14 +158,6 @@ public class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager
 
     @Test
     public void shouldBePositiveIfRemoveIsWorkingCorrectly() {
-        for (Task task : historyManager.getTasksHistory()) {
-            historyManager.remove(task.getTaskId());
-        }
-
-        taskManager.clearTasks();
-        taskManager.clearSubTasks();
-        taskManager.clearEpics();
-
         Task task1 = new Task("Сходить в ресторан", "Покушать салатик", TaskStatus.NEW);
         task1.setDuration(Duration.of(1, ChronoUnit.MINUTES));
         task1.setStartTime(LocalDateTime.of(2008, 5, 1, 1, 1));
@@ -204,13 +184,9 @@ public class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager
 
     @Test
     public void shouldBePositiveIfEpicStatusDONE() {
-        taskManager.clearTasks();
-        taskManager.clearSubTasks();
-        taskManager.clearEpics();
-
         LocalDateTime date1 = LocalDateTime.of(2023, 5, 16, 9, 0);
-        LocalDateTime date2 = LocalDateTime.of(2024, 5, 17, 10, 0); // Изменено время, чтобы избежать пересечения
-        LocalDateTime date3 = LocalDateTime.of(2025, 5, 18, 11, 0); // Изменено время, чтобы избежать пересечения
+        LocalDateTime date2 = LocalDateTime.of(2024, 5, 17, 10, 0);
+        LocalDateTime date3 = LocalDateTime.of(2025, 5, 18, 11, 0);
 
         Epic epic1 = new Epic("Сдать проект", "Убедиться что материал подготовлен", TaskStatus.NEW);
         taskManager.addEpic(epic1);
@@ -266,14 +242,6 @@ public class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager
 
     @Test
     public void shouldBePositiveIfTasksHistoryWorkCorrectly() {
-        for (Task task : historyManager.getTasksHistory()) {
-            historyManager.remove(task.getTaskId());
-        }
-
-        taskManager.clearTasks();
-        taskManager.clearSubTasks();
-        taskManager.clearEpics();
-
         Task task1 = new Task("Поиграть в доту", "Получить жетоны чтобы пройти дальше", TaskStatus.NEW);
         task1.setDuration(Duration.of(1, ChronoUnit.MINUTES));
         task1.setStartTime(LocalDateTime.of(2016, 5, 1, 1, 1));
@@ -281,12 +249,12 @@ public class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager
 
         Task task2 = new Task("Поиграть в валорант с другом", "Апнуть звание", TaskStatus.NEW);
         task2.setDuration(Duration.of(1, ChronoUnit.MINUTES));
-        task2.setStartTime(LocalDateTime.of(2017, 5, 1, 2, 1)); // Изменяем время начала, чтобы избежать пересечения
+        task2.setStartTime(LocalDateTime.of(2017, 5, 1, 2, 1));
         taskManager.addTask(task2);
 
         Task task3 = new Task("Приготовить покушать", "Купить курицу", TaskStatus.NEW);
         task3.setDuration(Duration.of(1, ChronoUnit.MINUTES));
-        task3.setStartTime(LocalDateTime.of(2018, 5, 1, 3, 1)); // Изменяем время начала, чтобы избежать пересечения
+        task3.setStartTime(LocalDateTime.of(2018, 5, 1, 3, 1));
         taskManager.addTask(task3);
 
         taskManager.getTaskById(task1.getTaskId());
@@ -296,5 +264,17 @@ public class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager
         List<Task> list1 = historyManager.getTasksHistory();
 
         assertEquals(3, list1.size());
+    }
+
+    private void clearTaskManager() {
+        taskManager.clearTasks();
+        taskManager.clearSubTasks();
+        taskManager.clearEpics();
+    }
+
+    private void clearHistoryManager() {
+        for (Task task : historyManager.getTasksHistory()) {
+            historyManager.remove(task.getTaskId());
+        }
     }
 }

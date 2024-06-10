@@ -21,19 +21,16 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 public class HttpTaskServerTest {
-    TaskManager manager = Managers.getDefault();
-    HttpTaskServer taskServer = new HttpTaskServer(manager);
-    Gson gson = HttpTaskServer.getGson();
-
-    public HttpTaskServerTest() throws IOException {
-
-    }
+    private TaskManager manager;
+    private HttpTaskServer taskServer;
+    private Gson gson;
 
     @BeforeEach
-    public void setUp() {
-        manager.clearTasks();
-        manager.clearSubTasks();
-        manager.clearEpics();
+    public void setUp() throws IOException {
+        manager = createTaskManager();
+        taskServer = createHttpTaskServer(manager);
+        gson = createGson();
+        clearTaskManager();
         taskServer.start();
     }
 
@@ -43,7 +40,7 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    public void testAddTask() throws IOException, InterruptedException {
+    public void testAddTaskShouldBePassIfTaskAddedCorrectly() throws IOException, InterruptedException {
         Task task = new Task("Test 2", "Testing task 2", TaskStatus.NEW);
         task.setDuration(Duration.ofMinutes(5));
         task.setStartTime(LocalDateTime.now().plusMinutes(1)); // Убедитесь, что время в будущем
@@ -70,7 +67,7 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    public void testAddTaskWithConflict() throws IOException, InterruptedException {
+    public void testAddTaskWithConflictShouldBePassIfTaskWasNotAdded() throws IOException, InterruptedException {
         Task task1 = new Task("Task 1", "First Task", TaskStatus.NEW);
         task1.setDuration(Duration.ofMinutes(60));
         task1.setStartTime(LocalDateTime.now().plusHours(1));
@@ -97,7 +94,7 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    public void testAddEpic() throws IOException, InterruptedException {
+    public void testAddEpicShouldBePassIfEpicAddedCorrectly() throws IOException, InterruptedException {
         Epic epic = new Epic("Epic 1", "Epic description", TaskStatus.NEW);
         epic.setDuration(Duration.ofMinutes(5));
         epic.setStartTime(LocalDateTime.now());
@@ -123,7 +120,7 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    public void testAddSubTask() throws IOException, InterruptedException {
+    public void testAddSubTaskShouldBePassIfSubTaskAddedCorrectly() throws IOException, InterruptedException {
         Epic epic = new Epic("Epic 1", "Epic description", TaskStatus.NEW);
         manager.addEpic(epic);
         HttpClient client = HttpClient.newHttpClient();
@@ -149,7 +146,7 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    public void testGetAllTasks() throws IOException, InterruptedException {
+    public void testGetAllTasksShouldBePassIfAllTasksHaveBeenReceived() throws IOException, InterruptedException {
         Task task = new Task("Task 1", "First Task", TaskStatus.NEW);
         task.setDuration(Duration.ofMinutes(60));
         task.setStartTime(LocalDateTime.now().plusHours(1));
@@ -169,7 +166,7 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    public void testGetTaskById() throws IOException, InterruptedException {
+    public void testGetTaskByIdShouldBePassIfTaskHaveBeenReceived() throws IOException, InterruptedException {
         Task task = new Task("Task 1", "First Task", TaskStatus.NEW);
         task.setDuration(Duration.ofMinutes(60));
         task.setStartTime(LocalDateTime.now().plusHours(1));
@@ -187,7 +184,7 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    public void testDeleteTaskById() throws IOException, InterruptedException {
+    public void testDeleteTaskByIdShouldBePositiveIfTheTaskWasDeleted() throws IOException, InterruptedException {
         Task task = new Task("Task 1", "First Task", TaskStatus.NEW);
         task.setDuration(Duration.ofMinutes(60));
         task.setStartTime(LocalDateTime.now().plusHours(1));
@@ -205,7 +202,7 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    public void testUpdateTaskById() throws IOException, InterruptedException {
+    public void testUpdateTaskByIdShouldBePassIfTaskWasUpdated() throws IOException, InterruptedException {
         Task task = new Task("Task 1", "First Task", TaskStatus.NEW);
         task.setDuration(Duration.ofMinutes(60));
         task.setStartTime(LocalDateTime.now().plusHours(1));
@@ -230,7 +227,7 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    public void testGetAllSubTasks() throws IOException, InterruptedException {
+    public void testGetAllSubTasksShouldBePassIfAllSubTasksHaveBeenReceived() throws IOException, InterruptedException {
         Epic epic = new Epic("Epic 1", "Epic description", TaskStatus.NEW);
         manager.addEpic(epic);
         SubTask subTask = new SubTask("SubTask 1", "SubTask description", TaskStatus.NEW,
@@ -253,7 +250,7 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    public void testGetAllEpics() throws IOException, InterruptedException {
+    public void testGetAllEpicsShouldBePassIfAllEpicsHaveBeenReceived() throws IOException, InterruptedException {
         Epic epic = new Epic("Epic 1", "Epic description", TaskStatus.NEW);
         manager.addEpic(epic);
 
@@ -271,7 +268,7 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    public void testGetHistory() throws IOException, InterruptedException {
+    public void testGetHistoryShouldBePassIfYheCorrectHistoryWasReceived() throws IOException, InterruptedException {
         Task task = new Task("Test Task", "Test Description", TaskStatus.NEW);
         task.setDuration(Duration.ofMinutes(30));
         task.setStartTime(LocalDateTime.now());
@@ -290,7 +287,8 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    public void testDeleteNonExistingTask() throws IOException, InterruptedException {
+    public void testDeleteNonExistingTasksShouldBePassIfTheServerReturnsCode404() throws IOException,
+            InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         URI url = URI.create("http://localhost:8080/tasks/100");
         HttpRequest request = HttpRequest.newBuilder().uri(url).DELETE().build();
@@ -301,7 +299,7 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    public void testUnsupportedMethod() throws IOException, InterruptedException {
+    public void testUnsupportedMethodShouldBePassIfTheServerReturnsCode405() throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         URI url = URI.create("http://localhost:8080/tasks");
         HttpRequest request = HttpRequest.newBuilder().uri(url).PUT(HttpRequest.BodyPublishers.noBody()).build();
@@ -312,7 +310,8 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    public void testDeleteNonExistingSubTask() throws IOException, InterruptedException {
+    public void testDeleteNonExistingSubTaskShouldBePassIfTheServerReturnsCode404() throws IOException,
+            InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         URI url = URI.create("http://localhost:8080/subtasks/100");
         HttpRequest request = HttpRequest.newBuilder().uri(url).DELETE().build();
@@ -323,7 +322,8 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    public void testDeleteNonExistingEpic() throws IOException, InterruptedException {
+    public void testDeleteNonExistingEpicShouldBePassIfTheServerReturnsCode404() throws IOException,
+            InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         URI url = URI.create("http://localhost:8080/epics/100");
         HttpRequest request = HttpRequest.newBuilder().uri(url).DELETE().build();
@@ -331,5 +331,23 @@ public class HttpTaskServerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
         assertEquals(404, response.statusCode());
+    }
+
+    private TaskManager createTaskManager() {
+        return Managers.getDefault();
+    }
+
+    private HttpTaskServer createHttpTaskServer(TaskManager manager) throws IOException {
+        return new HttpTaskServer(manager);
+    }
+
+    private Gson createGson() {
+        return HttpTaskServer.getGson();
+    }
+
+    private void clearTaskManager() {
+        manager.clearTasks();
+        manager.clearSubTasks();
+        manager.clearEpics();
     }
 }

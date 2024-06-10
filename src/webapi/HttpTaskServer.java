@@ -31,6 +31,18 @@ import exceptions.*;
 
 public class HttpTaskServer {
     private static final int PORT = 8080;
+    public static final String TASKS = "tasks";
+    public static final String SUBTASKS = "subtasks";
+    public static final String EPICS = "epics";
+    public static final String INVALID_REQUEST_MESSAGE = "Некорректный запрос";
+    public static final String NOT_FOUND_MESSAGE = "Не найдено";
+    public static final String INTERNAL_SERVER_ERROR_MESSAGE = "Внутренняя ошибка сервера";
+    public static final String METHOD_NOT_SUPPORTED_BY_SERVER = "Метод не поддерживается сервером";
+    public static final String GET = "GET";
+    public static final String POST = "POST";
+    public static final String DELETE = "DELETE";
+    public static final String HISTORY = "history";
+    public static final String PRIORITIZED = "prioritized";
     private final HttpServer server;
     static Gson gson = new GsonBuilder()
             .registerTypeAdapter(Duration.class, new TaskHandler.DurationAdapter())
@@ -80,17 +92,17 @@ public class HttpTaskServer {
             String[] requestsString = path.split("/");
             String method = httpExchange.getRequestMethod();
             switch (method.toUpperCase()) {
-                case "GET":
+                case GET:
                     handleGetRequest(httpExchange, requestsString);
                     break;
-                case "POST":
+                case POST:
                     handlePostRequest(httpExchange, requestsString);
                     break;
-                case "DELETE":
+                case DELETE:
                     handleDeleteRequest(httpExchange, requestsString);
                     break;
                 default:
-                    sendNotAllowed(httpExchange, "Метод не поддерживается сервером");
+                    sendNotAllowed(httpExchange, METHOD_NOT_SUPPORTED_BY_SERVER);
                     break;
             }
         }
@@ -112,7 +124,6 @@ public class HttpTaskServer {
 
         }
 
-        // LocalDateTimeAdapter
         public static class LocalDateTimeAdapter extends TypeAdapter<LocalDateTime> {
             private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
@@ -131,12 +142,12 @@ public class HttpTaskServer {
             }
         }
 
-        private void handleGetRequest(HttpExchange httpExchange, String[] requestsString) throws IOException {
+        private void handleGetRequest(HttpExchange httpExchange, String[] requestsString) {
             String response;
 
             try {
                 switch (requestsString[1]) {
-                    case "tasks":
+                    case TASKS:
                         if (requestsString.length == 2) {
                             System.out.println("Получаем задачи: " + taskManager.getTasks());
                             Type listType = new TypeToken<List<Task>>() {
@@ -148,10 +159,10 @@ public class HttpTaskServer {
                         } else if (requestsString.length == 3) {
                             handleGetTaskById(httpExchange, Integer.parseInt(requestsString[2]));
                         } else {
-                            sendNotFound(httpExchange, "Такой задачи нет");
+                            sendNotFound(httpExchange, NOT_FOUND_MESSAGE);
                         }
                         break;
-                    case "subtasks":
+                    case SUBTASKS:
                         if (requestsString.length == 2) {
                             System.out.println("Получаем подзадачи: " + taskManager.getSubTasks());
                             Type listType = new TypeToken<List<SubTask>>() {
@@ -163,10 +174,10 @@ public class HttpTaskServer {
                         } else if (requestsString.length == 3) {
                             handleGetSubtaskById(httpExchange, Integer.parseInt(requestsString[2]));
                         } else {
-                            sendNotFound(httpExchange, "Такой задачи нет");
+                            sendNotFound(httpExchange, NOT_FOUND_MESSAGE);
                         }
                         break;
-                    case "epics":
+                    case EPICS:
                         if (requestsString.length == 2) {
                             System.out.println("Получаем эпики: " + taskManager.getEpics());
                             Type listType = new TypeToken<List<Epic>>() {
@@ -177,27 +188,27 @@ public class HttpTaskServer {
                             sendText(httpExchange, response);
                         } else if (requestsString.length == 3) {
                             handleGetEpicById(httpExchange, Integer.parseInt(requestsString[2]));
-                        } else if (requestsString.length == 4 && "subtasks".equals(requestsString[3])) {
+                        } else if (requestsString.length == 4 && SUBTASKS.equals(requestsString[3])) {
                             handleGetEpicSubtasks(httpExchange, Integer.parseInt(requestsString[2]));
                         } else {
-                            sendNotFound(httpExchange, "Такой задачи нет");
+                            sendNotFound(httpExchange, NOT_FOUND_MESSAGE);
                         }
                         break;
-                    case "history":
+                    case HISTORY:
                         response = gson.toJson(taskManager.getHistory());
                         sendText(httpExchange, response);
                         break;
-                    case "prioritized":
+                    case PRIORITIZED:
                         response = gson.toJson(taskManager.getPrioritizedTasks());
                         sendText(httpExchange, response);
                         break;
                     default:
-                        sendNotFound(httpExchange, "Такой задачи нет");
+                        sendNotFound(httpExchange, NOT_FOUND_MESSAGE);
                         break;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                sendInternalServerError(httpExchange, "Внутренняя ошибка сервера");
+                sendInternalServerError(httpExchange, INTERNAL_SERVER_ERROR_MESSAGE);
             }
         }
 
@@ -209,12 +220,12 @@ public class HttpTaskServer {
                 Task task = parseToObject(body);
 
                 if (task == null) {
-                    sendInvalidRequest(httpExchange, "Некорректный формат Json");
+                    sendInvalidRequest(httpExchange, INVALID_REQUEST_MESSAGE);
                     return;
                 }
 
                 switch (requestsString[1]) {
-                    case "tasks":
+                    case TASKS:
                         if (requestsString.length == 2) {
                             System.out.println("Началось добавление таски в менеджер");
                             taskManager.addTask(task);
@@ -224,10 +235,10 @@ public class HttpTaskServer {
                             taskManager.updateTask(task, Integer.parseInt(requestsString[2]));
                             sendTextPost(httpExchange, "Задача обновлена");
                         } else {
-                            sendInvalidRequest(httpExchange, "Некорректный формат Json");
+                            sendInvalidRequest(httpExchange, INVALID_REQUEST_MESSAGE);
                         }
                         break;
-                    case "subtasks":
+                    case SUBTASKS:
                         if (requestsString.length == 2 && task instanceof SubTask) {
                             taskManager.addSubTask((SubTask) task);
                             sendTextPost(httpExchange, "Подзадача добавлена");
@@ -235,19 +246,19 @@ public class HttpTaskServer {
                             taskManager.updateSubTask((SubTask) task, Integer.parseInt(requestsString[2]));
                             sendTextPost(httpExchange, "Подзадача обновлена");
                         } else {
-                            sendInvalidRequest(httpExchange, "Некорректный формат Json");
+                            sendInvalidRequest(httpExchange, INVALID_REQUEST_MESSAGE);
                         }
                         break;
-                    case "epics":
+                    case EPICS:
                         if (requestsString.length == 2 && task instanceof Epic) {
                             taskManager.addEpic((Epic) task);
                             sendTextPost(httpExchange, "Эпик создан");
                         } else {
-                            sendInvalidRequest(httpExchange, "Некорректный формат Json");
+                            sendInvalidRequest(httpExchange, INVALID_REQUEST_MESSAGE);
                         }
                         break;
                     default:
-                        sendNotFound(httpExchange, "Эпик не найден");
+                        sendNotFound(httpExchange, NOT_FOUND_MESSAGE);
                         break;
                 }
             } catch (NumberFormatException e) {
@@ -256,13 +267,13 @@ public class HttpTaskServer {
                 sendHasInteractions(httpExchange, e.getMessage());
             } catch (Exception e) {
                 e.printStackTrace();
-                sendInternalServerError(httpExchange, "Внутренняя ошибка сервера");
+                sendInternalServerError(httpExchange, INTERNAL_SERVER_ERROR_MESSAGE);
             }
         }
 
-        private void handleDeleteRequest(HttpExchange httpExchange, String[] requestsString) throws IOException {
+        private void handleDeleteRequest(HttpExchange httpExchange, String[] requestsString) {
             if (requestsString.length < 3) {
-                sendInvalidRequest(httpExchange, "Некорректный запрос");
+                sendInvalidRequest(httpExchange, INVALID_REQUEST_MESSAGE);
                 return;
             }
 
@@ -270,28 +281,28 @@ public class HttpTaskServer {
 
             try {
                 switch (requestsString[1]) {
-                    case "tasks":
+                    case TASKS:
                         handleDeleteTaskById(httpExchange, id);
                         break;
-                    case "subtasks":
+                    case SUBTASKS:
                         handleDeleteSubTaskById(httpExchange, id);
                         break;
-                    case "epics":
+                    case EPICS:
                         handleDeleteEpicById(httpExchange, id);
                         break;
                     default:
-                        sendNotFound(httpExchange, "Не найдено");
+                        sendNotFound(httpExchange, NOT_FOUND_MESSAGE);
                         break;
                 }
             } catch (IllegalArgumentException e) {
                 sendNotFound(httpExchange, e.getMessage());
             } catch (Exception e) {
                 e.printStackTrace();
-                sendInternalServerError(httpExchange, "Внутренняя ошибка сервера");
+                sendInternalServerError(httpExchange, INTERNAL_SERVER_ERROR_MESSAGE);
             }
         }
 
-        private void handleDeleteTaskById(HttpExchange httpExchange, int id) throws IOException {
+        private void handleDeleteTaskById(HttpExchange httpExchange, int id) {
             try {
                 Task task = taskManager.getTaskById(id);
                 taskManager.removeTaskById(task.getTaskId());
@@ -301,7 +312,7 @@ public class HttpTaskServer {
             }
         }
 
-        private void handleDeleteSubTaskById(HttpExchange httpExchange, int id) throws IOException {
+        private void handleDeleteSubTaskById(HttpExchange httpExchange, int id) {
             try {
                 SubTask subTask = taskManager.getSubTaskById(id);
                 taskManager.removeSubTaskById(subTask.getTaskId());
@@ -311,7 +322,7 @@ public class HttpTaskServer {
             }
         }
 
-        private void handleDeleteEpicById(HttpExchange httpExchange, int id) throws IOException {
+        private void handleDeleteEpicById(HttpExchange httpExchange, int id) {
             try {
                 Epic epic = taskManager.getEpicById(id);
                 taskManager.removeEpicById(epic.getTaskId());
@@ -321,7 +332,7 @@ public class HttpTaskServer {
             }
         }
 
-        private void handleGetTaskById(HttpExchange httpExchange, int id) throws IOException {
+        private void handleGetTaskById(HttpExchange httpExchange, int id) {
             try {
                 Task task = taskManager.getTaskById(id);
                 sendText(httpExchange, gson.toJson(task));
@@ -330,7 +341,7 @@ public class HttpTaskServer {
             }
         }
 
-        private void handleGetSubtaskById(HttpExchange httpExchange, int id) throws IOException {
+        private void handleGetSubtaskById(HttpExchange httpExchange, int id) {
             try {
                 SubTask subTask = taskManager.getSubTaskById(id);
                 sendText(httpExchange, gson.toJson(subTask));
@@ -339,7 +350,7 @@ public class HttpTaskServer {
             }
         }
 
-        private void handleGetEpicById(HttpExchange httpExchange, int id) throws IOException {
+        private void handleGetEpicById(HttpExchange httpExchange, int id) {
             try {
                 Epic epic = taskManager.getEpicById(id);
                 sendText(httpExchange, gson.toJson(epic));
@@ -348,7 +359,7 @@ public class HttpTaskServer {
             }
         }
 
-        private void handleGetEpicSubtasks(HttpExchange httpExchange, int id) throws IOException {
+        private void handleGetEpicSubtasks(HttpExchange httpExchange, int id) {
             try {
                 Epic epic = taskManager.getEpicById(id);
                 sendText(httpExchange, gson.toJson(taskManager.getAllSubtasksForEpic(id)));
@@ -357,7 +368,7 @@ public class HttpTaskServer {
             }
         }
 
-        private static Task parseToObject(String json) {
+        private Task parseToObject(String json) {
             JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
             Task task = null;
             if (jsonObject.has("epicId")) {
@@ -369,14 +380,18 @@ public class HttpTaskServer {
             }
         }
 
-        private static TaskStatus getStatusFromTask(String str) {
+        private TaskStatus getStatusFromTask(String str) {
             TaskStatus status;
-            if (str.equals("NEW")) {
-                status = TaskStatus.NEW;
-            } else if (str.equals("DONE")) {
-                status = TaskStatus.DONE;
-            } else {
-                status = TaskStatus.IN_PROGRESS;
+            switch (str) {
+                case "NEW":
+                    status = TaskStatus.NEW;
+                    break;
+                case "DONE":
+                    status = TaskStatus.DONE;
+                    break;
+                default:
+                    status = TaskStatus.IN_PROGRESS;
+                    break;
             }
             return status;
         }

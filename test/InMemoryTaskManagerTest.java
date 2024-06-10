@@ -34,6 +34,7 @@ public class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager
 
     @Test
     public void areTheTaskCrossTest() {
+        clearTaskManager();
         Task task1 = new Task("Выйти поиграть с друзьями", "Взять воды", TaskStatus.NEW);
         task1.setStartTime(LocalDateTime.of(2035, 1, 6, 1, 1));
         task1.setDuration(Duration.of(1, ChronoUnit.MINUTES));
@@ -107,6 +108,7 @@ public class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager
 
     @Test
     public void shouldBePositiveIfEpicStatusIN_PROGRESSWhenSubTaskIN_PROGRESS() {
+        clearTaskManager();
         Duration duration = Duration.of(1, ChronoUnit.HOURS);
         LocalDateTime date1 = LocalDateTime.of(2029, 5, 22, 9, 0);
         LocalDateTime date2 = LocalDateTime.of(2030, 6, 23, 11, 0);
@@ -136,6 +138,7 @@ public class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager
 
     @Test
     public void shouldBePositiveIfEpicStatusIN_PROGRESS() {
+        clearTaskManager();
         Epic epic1 = new Epic("Сдать проект", "Убедиться что материал подготовлен", TaskStatus.NEW);
         taskManager.addEpic(epic1);
         SubTask sTask1 = new SubTask("Провести исследование", "Собрать ископаемые", TaskStatus.DONE,
@@ -158,6 +161,8 @@ public class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager
 
     @Test
     public void shouldBePositiveIfRemoveIsWorkingCorrectly() {
+        clearTaskManager();
+        clearHistoryManager();
         Task task1 = new Task("Сходить в ресторан", "Покушать салатик", TaskStatus.NEW);
         task1.setDuration(Duration.of(1, ChronoUnit.MINUTES));
         task1.setStartTime(LocalDateTime.of(2008, 5, 1, 1, 1));
@@ -184,6 +189,7 @@ public class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager
 
     @Test
     public void shouldBePositiveIfEpicStatusDONE() {
+        clearTaskManager();
         LocalDateTime date1 = LocalDateTime.of(2023, 5, 16, 9, 0);
         LocalDateTime date2 = LocalDateTime.of(2024, 5, 17, 10, 0);
         LocalDateTime date3 = LocalDateTime.of(2025, 5, 18, 11, 0);
@@ -214,6 +220,7 @@ public class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager
 
     @Test
     public void shouldBePositiveIfAdditionIsWorkingCorrectly() {
+        clearTaskManager();
         Task task1 = new Task("Выйти поиграть с друзьями", "Взять воды", TaskStatus.NEW);
         task1.setDuration(Duration.of(1, ChronoUnit.MINUTES));
         task1.setStartTime(LocalDateTime.of(2010, 5, 1, 1, 1));
@@ -242,6 +249,7 @@ public class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager
 
     @Test
     public void shouldBePositiveIfTasksHistoryWorkCorrectly() {
+        clearHistoryManager();
         Task task1 = new Task("Поиграть в доту", "Получить жетоны чтобы пройти дальше", TaskStatus.NEW);
         task1.setDuration(Duration.of(1, ChronoUnit.MINUTES));
         task1.setStartTime(LocalDateTime.of(2016, 5, 1, 1, 1));

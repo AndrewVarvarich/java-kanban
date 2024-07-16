@@ -1,21 +1,21 @@
 package task;
 
+import com.google.gson.annotations.SerializedName;
 import manager.*;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Epic extends Task {
 
-    private List<Integer> subtaskIds = new ArrayList<>();
+    private List<Integer> subtaskIds;
+    @SerializedName("epicEndTime")
     protected LocalDateTime endTime;
-    protected Duration duration;
-    protected LocalDateTime startTime;
 
     public Epic(String name, String description, TaskStatus status) {
         super(name, description, status);
+        this.subtaskIds = new ArrayList<>();
     }
 
     public void addSubTask(Integer subTaskId) {
@@ -24,14 +24,8 @@ public class Epic extends Task {
         }
     }
 
-    @Override
-    public void setDuration(Duration duration) {
-        this.duration = duration;
-    }
-
-    @Override
-    public void setStartTime(LocalDateTime startTime) {
-        this.startTime = startTime;
+    public void setSubtaskIds(List<Integer> subtaskIds) {
+        this.subtaskIds = subtaskIds;
     }
 
     public void removeSubTask(int id) {
@@ -49,11 +43,6 @@ public class Epic extends Task {
 
     public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
-    }
-
-    @Override
-    public LocalDateTime getStartTime() {
-        return startTime;
     }
 
     @Override
